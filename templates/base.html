@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Life OS</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<div id="banner">
+  <canvas id="pixel-canvas"></canvas>
+  <div id="banner-fade"></div>
+  <div id="banner-title">
+    <a href="/dashboard" style="text-decoration:none;display:flex;align-items:baseline;gap:10px;">
+      <div class="banner-icon">OS</div>
+      <div class="banner-name">Life OS<span>Uni · Sport · Leben</span></div>
+    </a>
+  </div>
+  <div id="notif-bar-inline" style="position:absolute;top:8px;right:16px;display:none;align-items:center;gap:8px;">
+    <span style="font-size:10px;color:var(--muted2);">Erinnerungen aktivieren?</span>
+    <button onclick="requestNotif()" style="padding:4px 10px;background:var(--accent);color:#000;border:none;border-radius:2px;font-family:var(--mono);font-size:10px;cursor:pointer;">Ja</button>
+    <button onclick="document.getElementById('notif-bar-inline').style.display='none'" style="padding:4px 10px;background:transparent;border:1px solid var(--border2);color:var(--muted2);border-radius:2px;font-family:var(--mono);font-size:10px;cursor:pointer;">Nein</button>
+  </div>
+</div>
+
+<div id="app">
+  <nav id="sidebar">
+    <div class="sidebar-section-label">Menu</div>
+    <a href="/dashboard"  class="nav-item {% if active=='dashboard' %}active{% endif %}">Dashboard</a>
+    <a href="/dashboard/uni"       class="nav-item {% if active=='uni' %}active{% endif %}">Uni</a>
+    <a href="/dashboard/sport"     class="nav-item {% if active=='sport' %}active{% endif %}">Sport</a>
+    <a href="/dashboard/projekte"  class="nav-item {% if active=='projekte' %}active{% endif %}">Projekte</a>
+    <a href="/dashboard/sprachen"  class="nav-item {% if active=='sprachen' %}active{% endif %}">Sprachen</a>
+    <a href="/dashboard/timetable" class="nav-item {% if active=='timetable' %}active{% endif %}">Wochenplan</a>
+
+    <!-- Pomodoro -->
+    <div id="pom-section">
+      <div id="pom-idle">
+        <button class="pom-idle-btn" onclick="pomShowPicker()">🍅 Pomodoro starten</button>
+        <div style="font-size:8px;color:var(--muted);text-align:center;margin-top:4px;letter-spacing:1px;">P — Shortcut</div>
+      </div>
+      <div id="pom-picker" style="display:none;">
+        <div style="font-size:8px;color:var(--muted2);letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;">Fach wählen</div>
+        <div class="pom-subject-picker" id="pom-subjects"></div>
+        <div class="pom-controls" style="margin-top:8px;">
+          <button class="pom-btn" onclick="pomStart()" style="color:var(--accent);border-color:var(--accent);">▶ Start 25min</button>
+        </div>
+      </div>
+      <div id="pom-running" style="display:none;" class="pom-running">
+        <div class="pom-time" id="pom-display">25:00</div>
+        <div class="pom-subject-label" id="pom-label">KL1 · #1 Session</div>
+        <div class="pom-progress"><div class="pom-progress-fill" id="pom-bar" style="width:0%"></div></div>
+        <div class="pom-controls" id="pom-ctrl-work">
+          <button class="pom-btn" id="pom-pause-btn" onclick="pomPause()">⏸</button>
+          <button class="pom-btn stop" onclick="pomStop()">■</button>
+          <button class="pom-btn" onclick="pomFocus()" title="Fokus-Modus (F)" style="font-size:10px;">⛶</button>
+        </div>
+        <div class="pom-controls" id="pom-ctrl-break" style="display:none;">
+          <button class="pom-btn" onclick="pomSkipBreak()">Überspringen ▶</button>
+        </div>
+        <div id="pom-dots" style="display:flex;gap:3px;justify-content:center;margin-top:6px;"></div>
+        <div style="font-size:8px;color:var(--muted);text-align:center;margin-top:4px;letter-spacing:1px;">F — Fokus · ESC — Beenden</div>
+      </div>
+    </div>
+
+    <!-- Clock -->
+    <div id="sidebar-clock">
+      <div id="clock-time">--:--</div>
+      <div id="clock-date">— —</div>
+      <div class="mini-progress">
+        <div class="mp-row">
+          <div class="mp-bar-wrap"><div class="mp-bar" id="bar-year" style="width:0%"></div></div>
+          <span class="mp-label">Jahr <span id="pct-year">0</span>%</span>
+        </div>
+        <div class="mp-row">
+          <div class="mp-bar-wrap"><div class="mp-bar" id="bar-month" style="width:0%"></div></div>
+          <span class="mp-label">Monat <span id="pct-month">0</span>%</span>
+        </div>
+        <div class="mp-row">
+          <div class="mp-bar-wrap"><div class="mp-bar" id="bar-week" style="width:0%"></div></div>
+          <span class="mp-label">Woche <span id="pct-week">0</span>%</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Streak -->
+    <div class="streak-badge" id="streak-section" style="display:none;">
+      <div class="streak-label">Streak</div>
+      <div style="display:flex;align-items:baseline;gap:5px;">
+        <span class="streak-num" id="streak-num">1</span>
+        <span class="streak-sub" id="streak-sub">Tag</span>
+      </div>
+      <div id="streak-log" style="margin-top:8px;border-top:1px solid var(--border);padding-top:6px;display:none;"></div>
+    </div>
+
+    <!-- Manual reminder -->
+    <div style="padding:8px 12px;">
+      <button onclick="showReminder(true)"
+        style="width:100%;padding:6px;background:transparent;border:1px dashed var(--border);color:var(--muted2);border-radius:3px;font-family:var(--mono);font-size:9px;letter-spacing:1px;transition:color 0.12s;"
+        onmouseenter="this.style.color='var(--text)'" onmouseleave="this.style.color='var(--muted2)'">
+        ⏰ Erinnerung anzeigen
+      </button>
+    </div>
+  </nav>
+
+  <main id="main">
+    {% block content %}{% endblock %}
+  </main>
+</div>
+
+<!-- Toast container -->
+<div id="toast-container"></div>
+
+<!-- Reminder Modal -->
+<div class="reminder-backdrop" id="reminder-modal" style="display:none;" onclick="if(event.target===this)closeReminder()">
+  <div class="reminder-card">
+    <div class="reminder-tag" id="reminder-tag" style="color:var(--accent);">⏰ Life OS — Erinnerung</div>
+    <div class="reminder-title" id="reminder-title">Zeit zu lernen!</div>
+    <div class="reminder-body" id="reminder-body"></div>
+    <button class="reminder-start" onclick="reminderStart()">▶ Pomodoro starten — 25 min</button>
+    <div class="reminder-secondary">
+      <button class="reminder-snooze" onclick="reminderSnooze()">Snooze 30 min</button>
+      <button class="reminder-dismiss" onclick="closeReminder()">Schon dabei ✓</button>
+    </div>
+  </div>
+</div>
+
+<!-- Focus Mode Overlay -->
+<div class="focus-overlay" id="focus-overlay" style="display:none;">
+  <div class="focus-phase" id="focus-phase">Deep Work</div>
+  <div class="focus-subject" id="focus-subject">KL1</div>
+  <div class="focus-time" id="focus-time">25:00</div>
+  <div class="focus-session" id="focus-session">Session #1</div>
+  <div class="focus-bar-wrap"><div class="focus-bar" id="focus-bar" style="width:0%"></div></div>
+  <div class="focus-controls">
+    <button class="focus-btn" id="focus-pause-btn" onclick="pomPause()">⏸ Pause</button>
+    <button class="focus-btn" onclick="pomStop();closeFocus()">■ Stop</button>
+    <button class="focus-btn" onclick="closeFocus()">↙ Minimieren</button>
+  </div>
+  <div class="focus-hint">ESC — Fokus-Modus beenden · F — Umschalten</div>
+</div>
+
+<!-- Session Log -->
+<div class="session-log" id="session-log" style="display:none;">
+  <div class="session-log-title">✅ Session abgeschlossen!</div>
+  <div class="session-log-sub" id="session-log-sub">KL1 · Was hast du gelernt?</div>
+  <input class="session-log-input" id="session-log-input" placeholder="z.B. Lagrange-Gleichungen..." autocomplete="off">
+  <div class="session-log-actions">
+    <button class="log-save" onclick="saveSessionLog()">Speichern</button>
+    <button class="log-skip" onclick="closeSessionLog()">Überspringen</button>
+  </div>
+</div>
+
+<script src="/static/app.js"></script>
+</body>
+</html>

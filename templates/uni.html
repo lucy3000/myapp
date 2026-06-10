@@ -1,0 +1,252 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="page">
+  <div class="page-title">Uni</div>
+  <div class="page-sub" id="uni-sub">SoSe 2026 · 2. Semester · 27 ECTS</div>
+
+  <div class="tab-bar">
+    <button class="tab-btn active" onclick="showTab('lernplan',this)">Lernplan</button>
+    <button class="tab-btn" onclick="showTab('module',this)">Module</button>
+    <button class="tab-btn" onclick="showTab('termine',this)">Termine</button>
+    <button class="tab-btn" onclick="showTab('methoden',this)">Methoden</button>
+  </div>
+
+  <!-- LERNPLAN -->
+  <div class="tab-content active" id="tab-lernplan">
+    <div style="display:flex;gap:4px;margin-bottom:20px;overflow-x:auto;padding-bottom:4px;" id="phase-timeline"></div>
+    <div id="phase-detail"></div>
+    <div class="sec-label">Alle Phasen</div>
+    <div id="all-phases"></div>
+  </div>
+
+  <!-- MODULE -->
+  <div class="tab-content" id="tab-module">
+    <div id="modules-list"></div>
+  </div>
+
+  <!-- TERMINE -->
+  <div class="tab-content" id="tab-termine">
+    <div style="margin-bottom:20px;">
+      <div style="font-family:var(--display);font-size:20px;font-style:italic;font-weight:700;margin-bottom:4px;">Timeline</div>
+      <div style="font-size:10px;color:var(--muted2);" id="termine-progress">0/0 erledigt</div>
+    </div>
+    <div class="card" style="padding:0;overflow:hidden;" id="termine-list"></div>
+  </div>
+
+  <!-- METHODEN -->
+  <div class="tab-content" id="tab-methoden">
+    <div style="font-family:var(--display);font-size:20px;font-style:italic;font-weight:700;margin-bottom:4px;">Science-Based Learning</div>
+    <div style="font-size:10px;color:var(--muted2);margin-bottom:20px;">Basierend auf Kognitionswissenschaft &amp; Lernforschung</div>
+    <div class="card" style="margin-bottom:8px;">
+      <div style="font-size:9px;color:var(--muted2);font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px;">◈ Active Recall</div>
+      <div style="font-size:11px;color:var(--text);line-height:1.5;margin-bottom:4px;">Aktives Abrufen schlägt Wiederlesen — Prüfe dich selbst. Studierende, die sich selbst testen, vergessen nur 13% nach 2 Tagen (vs. 56% beim Wiederlesen).</div>
+      <div style="font-size:9px;color:var(--muted2);font-style:italic;">Quelle: Karpicke, Purdue 2012</div>
+    </div>
+    <div class="card" style="margin-bottom:8px;">
+      <div style="font-size:9px;color:var(--muted2);font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px;">◉ Spaced Repetition</div>
+      <div style="font-size:11px;color:var(--text);line-height:1.5;margin-bottom:4px;">Verteile Lerneinheiten über Zeit — 1, 3, 7, 14 Tage. Anki oder manuelles Wiederholen verdoppelt die Retention im Vergleich zu Massed Practice.</div>
+      <div style="font-size:9px;color:var(--muted2);font-style:italic;">Quelle: Meta-Analyse, Springer 2025</div>
+    </div>
+    <div class="card" style="margin-bottom:8px;">
+      <div style="font-size:9px;color:var(--muted2);font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px;">▣ Interleaving</div>
+      <div style="font-size:11px;color:var(--text);line-height:1.5;margin-bottom:4px;">Wechsle zwischen Fächern und Aufgabentypen. Gemischtes Üben führte in Studien zu 63% vs. 54% Retention nach einem Monat.</div>
+      <div style="font-size:9px;color:var(--muted2);font-style:italic;">Quelle: PMC 2024, Interleaving STEM</div>
+    </div>
+    <div class="card" style="margin-bottom:8px;">
+      <div style="font-size:9px;color:var(--muted2);font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px;">◐ Pomodoro 25/5</div>
+      <div style="font-size:11px;color:var(--text);line-height:1.5;margin-bottom:4px;">Kognitive Leistung sinkt nach ~25–30 min. 25 min Vollgas + 5 min Pause ist die optimal getestete Einheit. Handy weg, Tür zu.</div>
+      <div style="font-size:9px;color:var(--muted2);font-style:italic;">Quelle: PMC 2025, Attention Research</div>
+    </div>
+    <div class="card" style="margin-bottom:8px;">
+      <div style="font-size:9px;color:var(--muted2);font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px;">✦ Schlaf</div>
+      <div style="font-size:11px;color:var(--text);line-height:1.5;margin-bottom:4px;">Schlaf konsolidiert Gedächtnis. 7–8h sind keine Verschwendung — Crammen nach Mitternacht kostet mehr als es bringt.</div>
+      <div style="font-size:9px;color:var(--muted2);font-style:italic;">Quelle: Walker 2017, Why We Sleep</div>
+    </div>
+    <div class="card" style="margin-top:16px;border-color:var(--border2);">
+      <div style="font-family:var(--sans);font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;color:var(--accent);">Optimale Studien-Session</div>
+      <div style="display:flex;gap:12px;margin-bottom:6px;font-size:10px;"><span style="color:var(--accent2);width:60px;flex-shrink:0;">0–5 min</span><span>Setup: Handy weg, Ziel definieren</span></div>
+      <div style="display:flex;gap:12px;margin-bottom:6px;font-size:10px;"><span style="color:var(--accent2);width:60px;flex-shrink:0;">5–30 min</span><span>Deep Work 1: Aufgaben lösen (kein Wiederlesen!)</span></div>
+      <div style="display:flex;gap:12px;margin-bottom:6px;font-size:10px;"><span style="color:var(--accent2);width:60px;flex-shrink:0;">30–35 min</span><span>Pause: Wasser, kurz bewegen</span></div>
+      <div style="display:flex;gap:12px;margin-bottom:6px;font-size:10px;"><span style="color:var(--accent2);width:60px;flex-shrink:0;">35–60 min</span><span>Deep Work 2: anderes Teilgebiet (Interleaving!)</span></div>
+      <div style="display:flex;gap:12px;margin-bottom:6px;font-size:10px;"><span style="color:var(--accent2);width:60px;flex-shrink:0;">65–90 min</span><span>Active Recall: alles aus Kopf aufschreiben</span></div>
+      <div style="display:flex;gap:12px;font-size:10px;"><span style="color:var(--accent2);width:60px;flex-shrink:0;">90 min</span><span>Lernziel prüfen, nächste Session planen</span></div>
+    </div>
+  </div>
+</div>
+
+<script>
+function showTab(id,btn){
+  document.querySelectorAll('.tab-content').forEach(el=>{el.classList.remove('active');});
+  document.querySelectorAll('.tab-btn').forEach(b=>{b.classList.remove('active');});
+  document.getElementById('tab-'+id).classList.add('active');
+  if(btn) btn.classList.add('active');
+}
+
+const EXAMS = [
+  {id:"mech2-kft", sub:"Mechanik 2",label:"KFT",          date:"2026-06-05",time:"13:00",col:"#f97316",type:"Vortest"},
+  {id:"kl1-ha3",   sub:"KL1",       label:"HA3",          date:"2026-06-07",time:"22:45",col:"#60a5fa",type:"Hausaufgabe"},
+  {id:"dgl-zwt",   sub:"DGL",       label:"Zwischentest", date:"2026-06-12",time:"22:00",col:"#a78bfa",type:"Zwischentest"},
+  {id:"kl1-ha4",   sub:"KL1",       label:"HA4",          date:"2026-06-21",time:"22:45",col:"#60a5fa",type:"Hausaufgabe"},
+  {id:"dts1",      sub:"ITP",       label:"Abgabe dts",   date:"2026-07-03",time:"16:00",col:"#22d3ee",type:"Abgabe"},
+  {id:"kl1-ha5",   sub:"KL1",       label:"HA5",          date:"2026-07-05",time:"22:45",col:"#60a5fa",type:"Hausaufgabe"},
+  {id:"itp-test",  sub:"ITP",       label:"Test",         date:"2026-07-14",time:"16:00",col:"#22d3ee",type:"Prüfung"},
+  {id:"dts2",      sub:"ITP",       label:"Abgabe dts",   date:"2026-07-17",time:"16:00",col:"#22d3ee",type:"Abgabe"},
+  {id:"dgl-final", sub:"DGL",       label:"Prüfung",      date:"2026-07-21",time:"13:30",col:"#a78bfa",type:"Prüfung"},
+  {id:"ana2-final",sub:"Ana2",      label:"Prüfung",      date:"2026-07-23",time:"15:00",col:"#4ade80",type:"Prüfung"},
+  {id:"kl1-test",  sub:"KL1",       label:"Test",         date:"2026-08-03",time:"12:00",col:"#60a5fa",type:"Prüfung"},
+  {id:"kl1-ha6",   sub:"KL1",       label:"HA6",          date:"2026-08-09",time:"22:45",col:"#60a5fa",type:"Hausaufgabe"},
+];
+const MODULES = [
+  {code:"MECH2",name:"Mechanik 2",      ects:6,col:"#f97316",difficulty:4,examDate:"2026-06-05",examLabel:"KFT 5. Jun",
+   topics:["Kinematik starrer Körper","Kinetik","Schwingungen","Dreidimensionale Mechanik"],
+   strategy:"Alte Klausuren durchrechnen — KFT kommt bald!"},
+  {code:"KL1",  name:"Klassische Mechanik 1",ects:6,col:"#60a5fa",difficulty:5,examDate:"2026-08-03",examLabel:"Test 3. Aug",
+   topics:["Lagrange-Formalismus","Erhaltungsgrößen","Hamiltonsche Mechanik","Zentralkraftprobleme","Starrer Körper"],
+   strategy:"HAs wöchentlich + regelmäßige Aufgaben mit Spaced Repetition"},
+  {code:"DGL",  name:"DGL für Ing",     ects:5,col:"#a78bfa",difficulty:3,examDate:"2026-07-21",examLabel:"Prüfung 21. Jul",
+   topics:["Lineare DGLs 1. & 2. Ordnung","Systeme von DGLs","Laplace-Transformation","Numerik"],
+   strategy:"Formelsammlung aufbauen + Zwischentest als Meilenstein"},
+  {code:"ANA2", name:"Analysis 2",      ects:6,col:"#4ade80",difficulty:4,examDate:"2026-07-23",examLabel:"Prüfung 23. Jul",
+   topics:["Mehrdimensionale Integration","Kurven- & Flächenintegrale","Vektoranalysis","Fourierreihen"],
+   strategy:"Interleaving mit DGL — viele gemeinsame Methoden"},
+  {code:"ITP",  name:"ITP",             ects:4,col:"#22d3ee",difficulty:3,examDate:"2026-07-14",examLabel:"Test 14. Jul",
+   topics:["Datenstrukturen","Algorithmen","Programmierparadigmen","dts-Abgaben"],
+   strategy:"dts-Projekte kontinuierlich bearbeiten"},
+];
+const PHASES = [
+  {id:"p1",label:"Phase 1",title:"Sofort-Modus",     from:"2026-05-27",to:"2026-06-05",focus:"Mechanik 2",badge:"9 Tage",badgeCol:"#ef4444",
+   desc:"KFT Mechanik2 am 5. Jun — voller Fokus. KL1 HA3 nebenbei fertigstellen.",
+   daily:[{sub:"Mechanik 2",h:3,col:"#f97316"},{sub:"KL1 HA3",h:1,col:"#60a5fa"},{sub:"DGL",h:0.5,col:"#a78bfa"}],
+   tactics:["Alle alten Klausuren Mechanik2 durchrechnen (Active Recall)","Fehler sofort nachschlagen","Formelblatt handschriftlich erstellen"]},
+  {id:"p2",label:"Phase 2",title:"DGL Zwischentest", from:"2026-06-06",to:"2026-06-12",focus:"DGL",badge:"7 Tage",badgeCol:"#f59e0b",
+   desc:"DGL Zwischentest am 12. Jun. Mech2 KFT ist durch — jetzt DGL Vollgas.",
+   daily:[{sub:"DGL",h:3,col:"#a78bfa"},{sub:"KL1",h:1,col:"#60a5fa"},{sub:"Ana2",h:0.5,col:"#4ade80"}],
+   tactics:["DGL Formelsammlung aufbauen (Anki-Karten)","Aufgaben von alten Zwischentests lösen","Interleave: DGL und Ana2 haben gemeinsame Methoden"]},
+  {id:"p3",label:"Phase 3",title:"Breite Basis",     from:"2026-06-13",to:"2026-07-13",focus:"Alle Fächer",badge:"30 Tage",badgeCol:"#4ade80",
+   desc:"Gleichmäßig alle Fächer voranbringen. ITP dts-Abgaben nicht verschleppen!",
+   daily:[{sub:"KL1",h:1.5,col:"#60a5fa"},{sub:"Ana2",h:1.5,col:"#4ade80"},{sub:"DGL",h:1,col:"#a78bfa"},{sub:"ITP",h:1,col:"#22d3ee"}],
+   tactics:["Interleaving: Täglich Fächer mischen","Wöchentliche Wiederholung aller Themen","ITP dts mind. 1h/Woche","KL1 HAs pünktlich abgeben"]},
+  {id:"p4",label:"Phase 4",title:"Prüfungsmarathon", from:"2026-07-14",to:"2026-07-23",focus:"ITP → DGL → Ana2",badge:"10 Tage",badgeCol:"#f97316",
+   desc:"ITP Test 14. Jul, DGL 21. Jul, Ana2 23. Jul. Drei in zehn Tagen.",
+   daily:[{sub:"Tagesfokus",h:4,col:"#ffffff"},{sub:"Wiederholung andere",h:1,col:"#52526a"}],
+   tactics:["14. Jul: ITP — 3 Tage vorher nur ITP","15–20. Jul: DGL — vollständige Formelsammlung","21. Jul abends: Ana2 Light-Review","Schlaf priorisieren: 7–8h"]},
+  {id:"p5",label:"Phase 5",title:"KL1 Endspurt",    from:"2026-07-24",to:"2026-08-03",focus:"KL1",badge:"11 Tage",badgeCol:"#60a5fa",
+   desc:"KL1 Test am 3. Aug. Voller Fokus auf Lagrange & Hamiltonismus.",
+   daily:[{sub:"KL1",h:4,col:"#60a5fa"},{sub:"Wiederholung",h:0.5,col:"#52526a"}],
+   tactics:["Alle Übungsblätter nochmals durchrechnen ohne Lösung","Lagrange & Hamiltonsche Mechanik auswendig","Mock-Prüfung 2 Tage vor Test"]},
+];
+
+function daysUntil(s){return Math.ceil((new Date(s)-new Date())/86400000);}
+function fmtDate(s){const d=new Date(s);return String(d.getDate()).padStart(2,'0')+'.'+String(d.getMonth()+1).padStart(2,'0')+'.';}
+
+(function initUni(){
+  const today = new Date();
+  const upcoming = EXAMS.filter(e=>daysUntil(e.date)>=0).sort((a,b)=>new Date(a.date)-new Date(b.date));
+  if(upcoming[0]){
+    const d=daysUntil(upcoming[0].date);
+    document.getElementById('uni-sub').textContent='SoSe 2026 · 2. Semester · 27 ECTS — Nächstes: '+upcoming[0].sub+' '+upcoming[0].label+' in '+d+'d';
+  }
+
+  // Phase timeline
+  const currentPhase = PHASES.find(p=>today>=new Date(p.from)&&today<=new Date(p.to))||PHASES[0];
+  const timeline = document.getElementById('phase-timeline');
+  PHASES.forEach(p=>{
+    const isActive = p.id===currentPhase.id;
+    const isPast   = new Date(p.to)<today;
+    timeline.innerHTML+=`<div style="flex:1;min-width:90px;padding:8px 10px;border-radius:3px;border:1px solid ${isActive?p.badgeCol:'var(--border)'};background:${isActive?p.badgeCol+'0f':'var(--card)'};opacity:${isPast?0.4:1};">
+      <div style="font-size:8px;color:${isActive?p.badgeCol:'var(--muted2)'};letter-spacing:2px;text-transform:uppercase;margin-bottom:3px;">${p.label}</div>
+      <div style="font-size:11px;font-family:var(--display);font-style:italic;font-weight:700;color:${isActive?'var(--accent)':'var(--text)'};">${p.title}</div>
+      <div style="font-size:9px;color:var(--muted2);margin-top:3px;">${fmtDate(p.from)} – ${fmtDate(p.to)}</div>
+    </div>`;
+  });
+
+  // Current phase detail
+  const pd=document.getElementById('phase-detail');
+  pd.innerHTML=`<div style="margin-bottom:20px;">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+      <span style="font-size:9px;padding:2px 8px;border-radius:2px;background:${currentPhase.badgeCol}22;color:${currentPhase.badgeCol};font-weight:700;letter-spacing:1px;">JETZT — ${currentPhase.badge}</span>
+      <div style="font-family:var(--display);font-size:18px;font-style:italic;font-weight:700;">${currentPhase.title}</div>
+    </div>
+    <div style="font-size:11px;color:var(--muted2);margin-bottom:14px;">${currentPhase.desc}</div>
+    <div class="sec-label">Tagesplanung</div>
+    ${currentPhase.daily.map(d=>`<div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;">
+      <span style="font-size:10px;width:110px;color:${d.col};font-weight:600;">${d.sub}</span>
+      <div style="flex:1;height:6px;background:var(--border);border-radius:3px;overflow:hidden;"><div style="height:100%;background:${d.col};width:${(d.h/5)*100}%;opacity:0.8;"></div></div>
+      <span style="font-size:10px;color:var(--muted2);width:30px;">${d.h}h</span>
+    </div>`).join('')}
+    <div class="sec-label" style="margin-top:16px;">Taktik</div>
+    <div class="card" style="padding:10px 14px;">${currentPhase.tactics.map(t=>`<div style="display:flex;gap:10px;margin-bottom:8px;font-size:11px;"><span style="color:${currentPhase.badgeCol};flex-shrink:0;">→</span><span>${t}</span></div>`).join('')}</div>
+  </div>`;
+
+  // All phases
+  const ap=document.getElementById('all-phases');
+  PHASES.forEach(p=>{
+    const isPast=new Date(p.to)<today;
+    ap.innerHTML+=`<div class="card" style="margin-bottom:8px;border-color:${p.id===currentPhase.id?p.badgeCol+'44':'var(--border)'};opacity:${isPast?0.5:1};">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;">
+        <div><span style="font-size:9px;color:${p.badgeCol};font-weight:700;letter-spacing:1px;margin-right:8px;">${p.label.toUpperCase()}</span>
+          <span style="font-family:var(--display);font-size:14px;font-style:italic;font-weight:700;">${p.title}</span></div>
+        <span style="font-size:9px;color:var(--muted2);">${fmtDate(p.from)} – ${fmtDate(p.to)}</span>
+      </div>
+      <div style="font-size:10px;color:var(--muted2);margin-bottom:8px;">${p.desc}</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;">${p.daily.map(d=>`<span style="font-size:9px;padding:2px 6px;border-radius:2px;border:1px solid ${d.col}33;color:${d.col};">${d.sub} ${d.h}h</span>`).join('')}</div>
+    </div>`;
+  });
+
+  // Modules
+  const ml=document.getElementById('modules-list');
+  let grades={};
+  try{grades=JSON.parse(localStorage.getItem('uni-grades')||'{}');}catch{}
+  MODULES.forEach(m=>{
+    const days=daysUntil(m.examDate);
+    const urgent=days<=14;
+    ml.innerHTML+=`<div class="card" style="margin-bottom:10px;border-color:${urgent?m.col+'44':'var(--border)'};">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;">
+        <div style="flex:1;">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+            <span class="tag" style="color:${m.col};border-color:${m.col}44;background:${m.col}11;">${m.code}</span>
+          </div>
+          <div style="font-family:var(--display);font-size:16px;font-style:italic;font-weight:700;color:var(--accent);">${m.name}</div>
+          <div style="font-size:9px;color:var(--muted2);">${m.ects} ECTS</div>
+        </div>
+        <div style="text-align:right;">
+          <div style="font-size:11px;color:${urgent?'#ef4444':m.col};font-weight:700;">${m.examLabel}</div>
+          <div style="font-size:9px;color:${urgent?'#ef4444':'var(--muted2)'};margin-top:2px;">in ${days} Tagen</div>
+          <div style="margin-top:6px;font-size:9px;color:var(--muted2);">Note: <span style="font-size:12px;font-weight:700;color:${grades[m.code]?m.col:'var(--muted2)'};">${grades[m.code]||'—'}</span></div>
+        </div>
+      </div>
+      <div style="display:flex;gap:3px;margin-bottom:10px;">${Array.from({length:5}).map((_,i)=>`<div style="width:20px;height:3px;border-radius:1px;background:${i<m.difficulty?m.col:'var(--border)'}"></div>`).join('')}<span style="font-size:9px;color:var(--muted2);margin-left:6px;">Schwierigkeit</span></div>
+      <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px;">${m.topics.map(t=>`<span style="font-size:9px;padding:2px 6px;border-radius:2px;border:1px solid var(--border2);color:var(--muted2);">${t}</span>`).join('')}</div>
+      <div style="font-size:10px;color:var(--muted2);border-top:1px solid var(--border);padding-top:8px;"><span style="color:${m.col};">→ </span>${m.strategy}</div>
+    </div>`;
+  });
+
+  // Termine
+  let doneDl={};
+  try{doneDl=JSON.parse(localStorage.getItem('uni-done')||'{}');}catch{}
+  function renderTermine(){
+    const tl=document.getElementById('termine-list');
+    tl.innerHTML='';
+    const done=EXAMS.filter(e=>doneDl[e.id]).length;
+    document.getElementById('termine-progress').textContent=done+'/'+EXAMS.length+' erledigt';
+    EXAMS.forEach(e=>{
+      const days=daysUntil(e.date);
+      const isDone=!!doneDl[e.id];
+      const isPast=days<0, isUrgent=days>=0&&days<=7;
+      const row=document.createElement('div');
+      row.className='deadline-row'+(isDone?' done':'');
+      row.innerHTML=`<div class="checkbox" style="border-color:${isDone?e.col:'var(--border2)'};background:${isDone?e.col:'transparent'};">${isDone?'✓':''}</div>
+        <div class="dl-dot" style="background:${e.col};"></div>
+        <div style="flex:1;"><div style="font-size:11px;font-weight:600;"><span style="color:${e.col};">${e.sub}</span> — ${e.label}</div><div style="font-size:9px;color:var(--muted2);">${e.type}</div></div>
+        <div style="text-align:right;">
+          <div style="font-size:11px;color:${isUrgent?'#ef4444':isPast?'var(--muted)':'var(--muted2)'};">${fmtDate(e.date)} ${e.time}</div>
+          <div style="font-size:9px;color:${isUrgent?'#ef4444':'var(--muted2)'};">${isPast?'vorbei':'in '+days+'d'}</div>
+        </div>`;
+      row.onclick=()=>{doneDl[e.id]=!doneDl[e.id];try{localStorage.setItem('uni-done',JSON.stringify(doneDl));}catch{}renderTermine();};
+      tl.appendChild(row);
+    });
+  }
+  renderTermine();
+})();
+</script>
+{% endblock %}

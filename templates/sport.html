@@ -1,0 +1,258 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="page">
+  <div class="page-title">Sport</div>
+  <div class="page-sub">Gym · Boxen · Laufen · Kraftziele</div>
+
+  <div class="tab-bar">
+    <button class="tab-btn active" onclick="showTab('gym',this)">Gym</button>
+    <button class="tab-btn" onclick="showTab('boxen',this)">Boxen</button>
+    <button class="tab-btn" onclick="showTab('laufen',this)">Laufen</button>
+    <button class="tab-btn" onclick="showTab('ziele',this)">Kraftziele</button>
+  </div>
+
+  <!-- GYM -->
+  <div class="tab-content active" id="tab-gym">
+    <div style="display:flex;gap:8px;margin-bottom:16px;">
+      <button class="gym-tab active" id="gym-btn-a" onclick="switchGym('a')">TAG A</button>
+      <button class="gym-tab" id="gym-btn-b" onclick="switchGym('b')">TAG B</button>
+    </div>
+    <div id="gym-content"></div>
+  </div>
+
+  <!-- BOXEN -->
+  <div class="tab-content" id="tab-boxen">
+    <div style="display:flex;gap:8px;margin-bottom:16px;">
+      <button class="gym-tab active" id="box-btn-mon" onclick="switchBox('mon')">Montag</button>
+      <button class="gym-tab" id="box-btn-wed" onclick="switchBox('wed')">Mittwoch</button>
+    </div>
+    <div id="box-content"></div>
+    <div class="sec-label">Technik-Bibliothek</div>
+    <div style="font-size:10px;color:var(--muted2);margin-bottom:10px;" id="tech-progress">0/0 gemeistert</div>
+    <div id="tech-content"></div>
+  </div>
+
+  <!-- LAUFEN -->
+  <div class="tab-content" id="tab-laufen">
+    <div style="font-family:var(--display);font-size:20px;font-style:italic;font-weight:700;margin-bottom:16px;">3× pro Woche</div>
+    <div class="card" style="margin-bottom:10px;border-color:#60a5fa22;">
+      <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
+        <div><span style="color:#60a5fa;font-weight:700;font-size:12px;">Easy Run</span><span style="font-size:10px;color:var(--muted2);margin-left:10px;">Montag</span></div>
+        <div style="display:flex;gap:8px;align-items:center;"><span style="font-size:9px;padding:1px 6px;border-radius:2px;border:1px solid #60a5fa44;color:#60a5fa;">Locker</span><span style="font-size:11px;color:#60a5fa;font-weight:700;">40 min</span></div>
+      </div>
+      <div style="font-size:11px;color:var(--text);margin-bottom:8px;">Puls ~130–140. Vor dem Boxabend — sanft bleiben.</div>
+      <div style="font-size:10px;color:var(--muted2);display:flex;gap:6px;margin-bottom:2px;"><span style="color:#60a5fa;">—</span>Morgens nüchtern</div>
+      <div style="font-size:10px;color:var(--muted2);display:flex;gap:6px;margin-bottom:2px;"><span style="color:#60a5fa;">—</span>Atemrhythmus 3:2</div>
+      <div style="font-size:10px;color:var(--muted2);display:flex;gap:6px;"><span style="color:#60a5fa;">—</span>Flaches Gelände</div>
+    </div>
+    <div class="card" style="margin-bottom:10px;border-color:#ef444422;">
+      <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
+        <div><span style="color:#ef4444;font-weight:700;font-size:12px;">Intervalle</span><span style="font-size:10px;color:var(--muted2);margin-left:10px;">Donnerstag</span></div>
+        <div style="display:flex;gap:8px;align-items:center;"><span style="font-size:9px;padding:1px 6px;border-radius:2px;border:1px solid #ef444444;color:#ef4444;">Hart</span><span style="font-size:11px;color:#ef4444;font-weight:700;">30 min</span></div>
+      </div>
+      <div style="font-size:11px;color:var(--text);margin-bottom:8px;">8× (1 min Sprint / 1 min Gehen) + 5 min Warm-up + Cool-down.</div>
+      <div style="font-size:10px;color:var(--muted2);display:flex;gap:6px;margin-bottom:2px;"><span style="color:#ef4444;">—</span>Sprint: 85–90% Maxpuls</div>
+      <div style="font-size:10px;color:var(--muted2);display:flex;gap:6px;margin-bottom:2px;"><span style="color:#ef4444;">—</span>Nicht komplett stehenbleiben</div>
+      <div style="font-size:10px;color:var(--muted2);display:flex;gap:6px;"><span style="color:#ef4444;">—</span>Auch Laufband möglich</div>
+    </div>
+    <div class="card" style="border-color:#22d3ee22;">
+      <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
+        <div><span style="color:#22d3ee;font-weight:700;font-size:12px;">Long Run</span><span style="font-size:10px;color:var(--muted2);margin-left:10px;">Samstag</span></div>
+        <div style="display:flex;gap:8px;align-items:center;"><span style="font-size:9px;padding:1px 6px;border-radius:2px;border:1px solid #22d3ee44;color:#22d3ee;">Mittel</span><span style="font-size:11px;color:#22d3ee;font-weight:700;">50–60 min</span></div>
+      </div>
+      <div style="font-size:11px;color:var(--text);margin-bottom:8px;">Gleichmäßiges Tempo. Puls ~140–155.</div>
+      <div style="font-size:10px;color:var(--muted2);display:flex;gap:6px;margin-bottom:2px;"><span style="color:#22d3ee;">—</span>1h nach Essen warten</div>
+      <div style="font-size:10px;color:var(--muted2);display:flex;gap:6px;margin-bottom:2px;"><span style="color:#22d3ee;">—</span>Hügel für Beinkraft</div>
+      <div style="font-size:10px;color:var(--muted2);display:flex;gap:6px;"><span style="color:#22d3ee;">—</span>Musik erlaubt</div>
+    </div>
+  </div>
+
+  <!-- ZIELE -->
+  <div class="tab-content" id="tab-ziele">
+    <div style="font-family:var(--display);font-size:20px;font-style:italic;font-weight:700;margin-bottom:16px;">Kraftziele 2026</div>
+    <div class="grid2">
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;margin-bottom:10px;"><div style="font-family:var(--display);font-size:14px;font-style:italic;font-weight:700;">Bankdrücken</div><span style="font-size:11px;color:#4ade80;font-weight:700;">70%</span></div>
+        <div style="font-size:11px;color:var(--muted2);margin-bottom:8px;">70 kg <span style="color:var(--border2);">→</span> <span style="color:#4ade80;">100 kg</span></div>
+        <div style="height:2px;background:var(--border);border-radius:1px;overflow:hidden;"><div style="height:100%;background:#4ade80;width:70%;transition:width 0.8s;"></div></div>
+      </div>
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;margin-bottom:10px;"><div style="font-family:var(--display);font-size:14px;font-style:italic;font-weight:700;">Kreuzheben</div><span style="font-size:11px;color:#f97316;font-weight:700;">64%</span></div>
+        <div style="font-size:11px;color:var(--muted2);margin-bottom:8px;">90 kg <span style="color:var(--border2);">→</span> <span style="color:#f97316;">140 kg</span></div>
+        <div style="height:2px;background:var(--border);border-radius:1px;overflow:hidden;"><div style="height:100%;background:#f97316;width:64%;transition:width 0.8s;"></div></div>
+      </div>
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;margin-bottom:10px;"><div style="font-family:var(--display);font-size:14px;font-style:italic;font-weight:700;">Back Squat</div><span style="font-size:11px;color:#60a5fa;font-weight:700;">67%</span></div>
+        <div style="font-size:11px;color:var(--muted2);margin-bottom:8px;">80 kg <span style="color:var(--border2);">→</span> <span style="color:#60a5fa;">120 kg</span></div>
+        <div style="height:2px;background:var(--border);border-radius:1px;overflow:hidden;"><div style="height:100%;background:#60a5fa;width:67%;transition:width 0.8s;"></div></div>
+      </div>
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;margin-bottom:10px;"><div style="font-family:var(--display);font-size:14px;font-style:italic;font-weight:700;">Hip Thrust</div><span style="font-size:11px;color:#f59e0b;font-weight:700;">60%</span></div>
+        <div style="font-size:11px;color:var(--muted2);margin-bottom:8px;">60 kg <span style="color:var(--border2);">→</span> <span style="color:#f59e0b;">100 kg</span></div>
+        <div style="height:2px;background:var(--border);border-radius:1px;overflow:hidden;"><div style="height:100%;background:#f59e0b;width:60%;transition:width 0.8s;"></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function showTab(id,btn){
+  document.querySelectorAll('.tab-content').forEach(el=>{el.classList.remove('active');});
+  document.querySelectorAll('.tab-btn').forEach(b=>{b.classList.remove('active');});
+  document.getElementById('tab-'+id).classList.add('active');
+  if(btn) btn.classList.add('active');
+}
+
+const GYM = {
+  a:{tag:'TAG A',day:'Mittwoch',title:'Push + Beine',sub:'Brust · Schultern · Trizeps · Beine (leicht)',col:'#4ade80',
+     warn:'Gewichte LEICHTER — Boxen um 18:00.',
+     sections:[
+       {name:'Warm-Up',exs:[['Rudergerät','1','5 min','—'],['Aufwärmsatz Bankdrücken','2','15 Wdh','50%']]},
+       {name:'Push — Oberkörper',exs:[['Bankdrücken (Langhantel)','4','6–8 Wdh','Mittel'],['Militärpress (Langhantel)','3','8 Wdh','Mittel'],['Trizeps Pushdown (Kabel)','3','12 Wdh','Leicht']]},
+       {name:'Beine — Leicht',exs:[['Front Squat (Langhantel)','3','8 Wdh','Mittel'],['Hip Thrust (Langhantel)','3','10 Wdh','Mittel'],['Leg Press (Maschine)','3','12 Wdh','Mittel']]},
+       {name:'Core Finisher',exs:[['Pallof Press (Kabel)','2','12 je Seite','Leicht'],['Hollow Body Hold','2','20 Sek','—']]},
+     ]},
+  b:{tag:'TAG B',day:'Freitag',title:'Pull + Beine',sub:'Rücken · Bizeps · Beine (schwer) · Core',col:'#f97316',
+     warn:null,
+     sections:[
+       {name:'Warm-Up',exs:[['Rudergerät','1','5 min','—'],['Klimmzüge Aufwärmsatz','2','5 Wdh','—']]},
+       {name:'Pull — Rücken & Bizeps',exs:[['Klimmzüge (Gewichtet)','4','5–6 Wdh','Schwer'],['Kreuzheben (Langhantel)','4','5 Wdh','Schwer'],['Pendlay Row','3','6 Wdh','Schwer'],['Face Pull (Kabel)','3','15 Wdh','Leicht']]},
+       {name:'Beine — Schwer',exs:[['Back Squat (Langhantel)','4','5 Wdh','Schwer'],['Rumänisches Kreuzheben','3','8 Wdh','Schwer'],['Hip Thrust (Langhantel)','4','8 Wdh','Schwer'],['Bulgarische Split Squats','3','10 je Bein','Mittel']]},
+       {name:'Core Power',exs:[['Kabelrotation (stehend)','3','12 je Seite','Mittel'],['Ab-Wheel Rollout','3','10 Wdh','—']]},
+     ]},
+};
+const LOAD_COLS={'Schwer':'#4ade80','Mittel':'#52526a','Leicht':'#2a2a3a','—':'#1e1e2a','50%':'#2a2a3a'};
+const BOX_SESSIONS = {
+  mon:{day:'Montag',time:'18:00',focus:'Technik + Kondition',col:'#a0a0ff',
+       drills:[{id:'m1',text:'Seilspringen — 3× 3 min'},{id:'m2',text:'Schattenboxen — 3× 2 min'},{id:'m3',text:'Sandsack — 4× 3 min'},{id:'m4',text:'Pratzen — 3× 3 min'},{id:'m5',text:'Stretching 10 min'}]},
+  wed:{day:'Mittwoch',time:'18:00',focus:'Sparring + Kraft',col:'#8888ff',
+       drills:[{id:'w1',text:'Seilspringen — 2× 3 min'},{id:'w2',text:'Pratzen Technik — 3× 3 min'},{id:'w3',text:'Sparring — 3× 3 min'},{id:'w4',text:'Konditionsübungen'},{id:'w5',text:'Cool-down + Stretching'}]},
+};
+const TECHNIQUES=[
+  {id:'t1',name:'Jab–Cross',cat:'Kombos',level:'Basis'},
+  {id:'t2',name:'Jab–Cross–Hook',cat:'Kombos',level:'Basis'},
+  {id:'t3',name:'Jab–Cross–Hook–Uppercut',cat:'Kombos',level:'Mittel'},
+  {id:'t4',name:'Body–Jab–Head',cat:'Kombos',level:'Mittel'},
+  {id:'t5',name:'Slip außen',cat:'Defense',level:'Basis'},
+  {id:'t6',name:'Slip innen + Counter',cat:'Defense',level:'Mittel'},
+  {id:'t7',name:'Roll under + Hook',cat:'Defense',level:'Mittel'},
+  {id:'t8',name:'Pivot + Jab',cat:'Footwork',level:'Mittel'},
+];
+const LEVEL_COL={Basis:'#4ade80',Mittel:'#f59e0b',Schwer:'#ef4444'};
+
+let gymChecked={}, boxDone={}, techDone={};
+try{gymChecked=JSON.parse(localStorage.getItem('gym-checked')||'{}');}catch{}
+try{boxDone=JSON.parse(localStorage.getItem('box-done')||'{}');}catch{}
+try{techDone=JSON.parse(localStorage.getItem('box-tech')||'{}');}catch{}
+
+function saveGym(){try{localStorage.setItem('gym-checked',JSON.stringify(gymChecked));}catch{}}
+function saveBox(){try{localStorage.setItem('box-done',JSON.stringify(boxDone));}catch{}}
+function saveTech(){try{localStorage.setItem('box-tech',JSON.stringify(techDone));}catch{}}
+
+let currentGym='a', currentBox='mon';
+
+function renderGym(){
+  const g=GYM[currentGym];
+  const total=g.sections.reduce((a,s)=>a+s.exs.length,0);
+  const done=g.sections.reduce((a,s,si)=>a+s.exs.filter((_,ei)=>gymChecked[currentGym+'-'+si+'-'+ei]).length,0);
+  const pct=total?Math.round((done/total)*100):0;
+  let html=`<div style="margin-bottom:12px;">
+    <div style="font-family:var(--display);font-size:20px;font-style:italic;font-weight:700;margin-bottom:2px;">${g.title}</div>
+    <div style="font-size:10px;color:var(--muted2);margin-bottom:8px;">${g.sub} · ${g.day}</div>
+    ${g.warn?`<div class="warn-box">⚠ ${g.warn}</div>`:''}
+    <div style="display:flex;align-items:center;gap:10px;">
+      <div style="flex:1;height:2px;background:var(--border);border-radius:1px;overflow:hidden;"><div style="height:100%;background:${g.col};width:${pct}%;transition:width 0.5s;"></div></div>
+      <span style="font-size:10px;color:${g.col};font-weight:700;">${done}/${total}</span>
+    </div></div>`;
+  g.sections.forEach((sec,si)=>{
+    html+=`<div class="sec-div">${sec.name}</div><div class="card" style="padding:0;overflow:hidden;margin-bottom:4px;">`;
+    sec.exs.forEach(([name,sets,,load],ei)=>{
+      const key=currentGym+'-'+si+'-'+ei;
+      const isDone=!!gymChecked[key];
+      const lc=LOAD_COLS[load]||'var(--muted)';
+      html+=`<div class="ex-row${isDone?' done':''}" data-key="${key}" onclick="toggleGym('${key}')">
+        <div class="checkbox" style="border-color:${isDone?g.col:'var(--border2)'};background:${isDone?g.col:'transparent'};">${isDone?'✓':''}</div>
+        <div class="ex-name${isDone?' done':''}">${name}</div>
+        <div class="ex-sets" style="color:${g.col};">${sets}×</div>
+        ${load!=='—'?`<span class="load-badge" style="color:${lc};border-color:${lc}66;">${load}</span>`:''}
+      </div>`;
+    });
+    html+='</div>';
+  });
+  document.getElementById('gym-content').innerHTML=html;
+}
+
+function toggleGym(key){gymChecked[key]=!gymChecked[key];saveGym();renderGym();}
+
+function switchGym(id){
+  currentGym=id;
+  document.getElementById('gym-btn-a').classList.toggle('active',id==='a');
+  document.getElementById('gym-btn-b').classList.toggle('active',id==='b');
+  document.getElementById('gym-btn-a').style.borderColor=id==='a'?GYM.a.col:'';
+  document.getElementById('gym-btn-a').style.color=id==='a'?GYM.a.col:'';
+  document.getElementById('gym-btn-b').style.borderColor=id==='b'?GYM.b.col:'';
+  document.getElementById('gym-btn-b').style.color=id==='b'?GYM.b.col:'';
+  renderGym();
+}
+
+function renderBox(){
+  const s=BOX_SESSIONS[currentBox];
+  const done=s.drills.filter(d=>boxDone[d.id]).length;
+  let html=`<div style="margin-bottom:12px;">
+    <div style="font-family:var(--display);font-size:20px;font-style:italic;font-weight:700;margin-bottom:2px;">${s.focus}</div>
+    <div style="font-size:10px;color:var(--muted2);margin-bottom:8px;">${s.day} · ${s.time}</div>
+    <div style="display:flex;align-items:center;gap:10px;">
+      <div style="flex:1;height:2px;background:var(--border);border-radius:1px;overflow:hidden;"><div style="height:100%;background:${s.col};width:${(done/s.drills.length)*100}%;transition:width 0.5s;"></div></div>
+      <span style="font-size:10px;color:${s.col};font-weight:700;">${done}/${s.drills.length}</span>
+    </div></div><div class="card" style="padding:0;overflow:hidden;margin-bottom:16px;">`;
+  s.drills.forEach(d=>{
+    const isDone=!!boxDone[d.id];
+    html+=`<div class="technique-row${isDone?' done':''}" onclick="toggleBox('${d.id}')">
+      <div class="checkbox" style="border-color:${isDone?s.col:'var(--border2)'};background:${isDone?s.col:'transparent'};">${isDone?'✓':''}</div>
+      <span style="font-size:11px;">${d.text}</span></div>`;
+  });
+  html+='</div>';
+  document.getElementById('box-content').innerHTML=html;
+}
+
+function toggleBox(id){boxDone[id]=!boxDone[id];saveBox();renderBox();}
+
+function switchBox(id){
+  currentBox=id;
+  const colMon=BOX_SESSIONS.mon.col, colWed=BOX_SESSIONS.wed.col;
+  document.getElementById('box-btn-mon').style.borderColor=id==='mon'?colMon:'';
+  document.getElementById('box-btn-mon').style.color=id==='mon'?colMon:'';
+  document.getElementById('box-btn-wed').style.borderColor=id==='wed'?colWed:'';
+  document.getElementById('box-btn-wed').style.color=id==='wed'?colWed:'';
+  renderBox();
+}
+
+function renderTech(){
+  const total=TECHNIQUES.length;
+  const done=TECHNIQUES.filter(t=>techDone[t.id]).length;
+  document.getElementById('tech-progress').textContent=done+'/'+total+' gemeistert';
+  let html='';
+  ['Kombos','Defense','Footwork'].forEach(cat=>{
+    html+=`<div class="sec-div">${cat}</div><div class="card" style="padding:0;overflow:hidden;margin-bottom:4px;">`;
+    TECHNIQUES.filter(t=>t.cat===cat).forEach(t=>{
+      const isDone=!!techDone[t.id];
+      const lc=LEVEL_COL[t.level];
+      html+=`<div class="technique-row${isDone?' done':''}" onclick="toggleTech('${t.id}')">
+        <div class="checkbox" style="border-color:${isDone?lc:'var(--border2)'};background:${isDone?lc:'transparent'};">${isDone?'✓':''}</div>
+        <span style="font-size:11px;flex:1;">${t.name}</span>
+        <span style="font-size:8px;padding:1px 5px;border-radius:2px;border:1px solid ${lc}44;color:${lc};">${t.level}</span>
+      </div>`;
+    });
+    html+='</div>';
+  });
+  document.getElementById('tech-content').innerHTML=html;
+}
+
+function toggleTech(id){techDone[id]=!techDone[id];saveTech();renderTech();}
+
+renderGym();
+switchGym('a');
+renderBox();
+renderTech();
+</script>
+{% endblock %}

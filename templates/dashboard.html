@@ -1,0 +1,209 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="page">
+
+  <!-- Hero -->
+  <div class="dash-hero">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+      <div>
+        <div style="font-size:9px;color:var(--muted2);letter-spacing:3px;text-transform:uppercase;margin-bottom:8px;" id="hero-day">— · SoSe 2026</div>
+        <div style="font-family:var(--display);font-size:28px;font-style:italic;font-weight:700;line-height:1;color:var(--accent);" id="hero-phase">—</div>
+        <div style="font-size:10px;margin-top:6px;font-weight:700;" id="hero-focus"></div>
+        <div style="font-size:10px;color:var(--muted2);margin-top:10px;font-style:italic;max-width:280px;line-height:1.5;" id="hero-quote"></div>
+      </div>
+      <div style="text-align:right;flex-shrink:0;" id="hero-next-wrap">
+        <div style="font-size:9px;color:var(--muted2);letter-spacing:2px;text-transform:uppercase;margin-bottom:4px;">Nächstes</div>
+        <div class="dash-stat-num" id="hero-next-days" style="color:var(--accent);">—</div>
+        <div style="font-size:10px;color:var(--muted2);margin-top:3px;" id="hero-next-label"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Heute -->
+  <div id="today-section" style="display:none;">
+    <div class="sec-label">Heute</div>
+    <div id="today-events" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:4px;"></div>
+  </div>
+
+  <!-- Nächste Termine -->
+  <div class="sec-label">Nächste Termine</div>
+  <div class="card" style="padding:0;overflow:hidden;margin-bottom:16px;" id="upcoming-list"></div>
+
+  <!-- Prüfungen -->
+  <div id="exams-section" style="display:none;">
+    <div class="sec-label">Prüfungen</div>
+    <div class="grid2" style="margin-bottom:16px;" id="exams-grid"></div>
+  </div>
+
+  <!-- Habits -->
+  <div class="sec-label">Heute — Habits</div>
+  <div class="card" style="padding:4px 14px;margin-bottom:16px;" id="habits-list"></div>
+
+  <!-- Schnellzugriff -->
+  <div class="sec-label">Schnellzugriff</div>
+  <div class="dash-grid">
+    <a href="/dashboard/uni" class="quick-card" style="border-color:#a78bfa22">
+      <div class="quick-card-icon">◐</div>
+      <div class="quick-card-title" style="color:#a78bfa;">Lernplan</div>
+      <div class="quick-card-sub">Phasen · Methoden · Termine</div>
+    </a>
+    <a href="/dashboard/sport" class="quick-card" style="border-color:#4ade8022">
+      <div class="quick-card-icon">▣</div>
+      <div class="quick-card-title" style="color:#4ade80;">Sport</div>
+      <div class="quick-card-sub">Gym · Boxen · Laufen</div>
+    </a>
+    <a href="/dashboard/projekte" class="quick-card" style="border-color:#f9731622">
+      <div class="quick-card-icon">🚀</div>
+      <div class="quick-card-title" style="color:#f97316;">BEARS</div>
+      <div class="quick-card-sub">Avionics · Propulsion</div>
+    </a>
+    <a href="/dashboard/timetable" class="quick-card" style="border-color:#60a5fa22">
+      <div class="quick-card-icon">▦</div>
+      <div class="quick-card-title" style="color:#60a5fa;">Wochenplan</div>
+      <div class="quick-card-sub">Aktuelle Woche</div>
+    </a>
+  </div>
+
+</div>
+
+<script>
+const EXAMS = [
+  { sub:"Mechanik 2", label:"KFT",         date:"2026-06-05", time:"13:00", col:"#f97316" },
+  { sub:"KL1",        label:"HA3",          date:"2026-06-07", time:"22:45", col:"#60a5fa" },
+  { sub:"DGL",        label:"Zwischentest", date:"2026-06-12", time:"22:00", col:"#a78bfa" },
+  { sub:"KL1",        label:"HA4",          date:"2026-06-21", time:"22:45", col:"#60a5fa" },
+  { sub:"ITP",        label:"Abgabe dts",   date:"2026-07-03", time:"16:00", col:"#22d3ee" },
+  { sub:"KL1",        label:"HA5",          date:"2026-07-05", time:"22:45", col:"#60a5fa" },
+  { sub:"ITP",        label:"Test",         date:"2026-07-14", time:"16:00", col:"#22d3ee" },
+  { sub:"DGL",        label:"Prüfung",      date:"2026-07-21", time:"13:30", col:"#a78bfa" },
+  { sub:"Ana2",       label:"Prüfung",      date:"2026-07-23", time:"15:00", col:"#4ade80" },
+  { sub:"KL1",        label:"Test",         date:"2026-08-03", time:"12:00", col:"#60a5fa" },
+];
+const WEEK_EVENTS = {
+  Mo:[{label:"🏃 Easy Run",col:"#60a5fa",href:"/dashboard/sport"},{label:"🥊 Boxen 18:00",col:"#8888ff",href:"/dashboard/sport"}],
+  Di:[{label:"Uni",col:"#a78bfa",href:"/dashboard/uni"},{label:"🚀 BEARS 16–21",col:"#f97316",href:"/dashboard/projekte"}],
+  Mi:[{label:"🏋️ GYM A",col:"#4ade80",href:"/dashboard/sport"},{label:"🥊 Boxen 18:00",col:"#8888ff",href:"/dashboard/sport"}],
+  Do:[{label:"🏃 Intervalle",col:"#60a5fa",href:"/dashboard/sport"},{label:"🚀 BEARS 16–22",col:"#f97316",href:"/dashboard/projekte"}],
+  Fr:[{label:"🏋️ GYM B",col:"#f97316",href:"/dashboard/sport"}],
+  Sa:[{label:"Bäcker 7–11",col:"#f59e0b",href:"#"},{label:"🏃 Long Run",col:"#22d3ee",href:"/dashboard/sport"}],
+  So:[{label:"Ruhetag 💤",col:"#28283a",href:"#"}],
+};
+const DAYS_DE = ["So","Mo","Di","Mi","Do","Fr","Sa"];
+const PHASES = [
+  {title:"Sofort-Modus",     from:"2026-05-27",to:"2026-06-05",col:"#ef4444",focus:"Mechanik 2"},
+  {title:"DGL Zwischentest", from:"2026-06-06",to:"2026-06-12",col:"#f59e0b",focus:"DGL"},
+  {title:"Breite Basis",     from:"2026-06-13",to:"2026-07-13",col:"#4ade80",focus:"Alle Fächer"},
+  {title:"Prüfungsmarathon", from:"2026-07-14",to:"2026-07-23",col:"#f97316",focus:"ITP → DGL → Ana2"},
+  {title:"KL1 Endspurt",     from:"2026-07-24",to:"2026-08-03",col:"#60a5fa",focus:"KL1"},
+];
+const QUOTES = [
+  "Jede 25-Minuten-Session bringt dich näher ans Ziel.",
+  "Active Recall schlägt Lesen. Teste dich selbst.",
+  "Interleaving: Wechsle heute zwischen zwei Fächern.",
+  "Kurze Session > Keine Session.",
+  "Schlaf ist kein Feind — er festigt das Gelernte.",
+  "Spaced Repetition: Heute wiederholen, was du vor 3 Tagen gelernt hast.",
+];
+const HABITS = [
+  {id:"h-es",    label:"🇪🇸 Spanisch 30 min",         col:"#f97316"},
+  {id:"h-ru",    label:"🇷🇺 Russisch 30 min",          col:"#60a5fa"},
+  {id:"h-pom",   label:"🍅 Lerneinheit (1+ Pomodoro)", col:"#ffffff"},
+  {id:"h-sport", label:"🏋️ Sport / Gym",               col:"#4ade80"},
+  {id:"h-sleep", label:"😴 Vor 23:00 schlafen",        col:"#a78bfa"},
+];
+
+function daysUntil(s){ return Math.ceil((new Date(s)-new Date())/86400000); }
+
+(function initDashboard(){
+  const now = new Date();
+  const dayKey = DAYS_DE[now.getDay()];
+
+  // Hero: phase
+  const phase = PHASES.find(p=>now>=new Date(p.from)&&now<=new Date(p.to))||PHASES[0];
+  document.getElementById('hero-day').textContent = dayKey + ' · SoSe 2026';
+  document.getElementById('hero-phase').textContent = phase.title;
+  document.getElementById('hero-focus').textContent = 'Fokus: ' + phase.focus;
+  document.getElementById('hero-focus').style.color = phase.col;
+  document.getElementById('hero-quote').textContent = '"' + QUOTES[now.getHours() % QUOTES.length] + '"';
+
+  // Upcoming exams
+  const upcoming = EXAMS.map(e=>({...e,days:daysUntil(e.date)}))
+    .filter(e=>e.days>=0).sort((a,b)=>a.days-b.days).slice(0,5);
+
+  if(upcoming.length){
+    const nx = upcoming[0];
+    document.getElementById('hero-next-days').textContent = nx.days+'d';
+    document.getElementById('hero-next-days').style.color = nx.days<=7?'#ef4444':nx.col;
+    document.getElementById('hero-next-label').textContent = nx.sub+' '+nx.label;
+  } else {
+    document.getElementById('hero-next-wrap').style.display='none';
+  }
+
+  const upList = document.getElementById('upcoming-list');
+  upcoming.forEach(e=>{
+    const row = document.createElement('div');
+    row.style.cssText='display:flex;align-items:center;gap:10px;padding:9px 14px;border-bottom:1px solid var(--border);';
+    row.innerHTML = `<div style="width:6px;height:6px;border-radius:50%;background:${e.col};flex-shrink:0;"></div>
+      <div style="flex:1;font-size:11px;"><span style="color:${e.col};font-weight:700;">${e.sub}</span><span style="color:var(--muted2);margin-left:6px;">${e.label}</span></div>
+      <div style="text-align:right;">
+        <span style="font-size:11px;font-weight:700;color:${e.days<=7?'#ef4444':'var(--muted2)'};">${e.days===0?'Heute!':'in '+e.days+'d'}</span>
+        <div style="font-size:9px;color:var(--muted2);">${e.time}</div>
+      </div>`;
+    upList.appendChild(row);
+  });
+
+  // Final exams grid
+  const finals = upcoming.filter(e=>['Prüfung','Test'].includes(e.label));
+  if(finals.length){
+    document.getElementById('exams-section').style.display='block';
+    const grid = document.getElementById('exams-grid');
+    finals.forEach(e=>{
+      const d = e.date.split('-').reverse().slice(0,2).join('.');
+      grid.innerHTML += `<a href="/dashboard/uni" style="text-decoration:none;">
+        <div class="card" style="border-color:${e.col}33;cursor:pointer;">
+          <div style="font-family:var(--display);font-size:15px;font-style:italic;font-weight:700;margin-bottom:4px;color:var(--accent);">${e.sub}</div>
+          <div style="font-size:9px;color:var(--muted2);margin-bottom:8px;">${d}</div>
+          <div style="font-size:22px;font-weight:700;color:${e.days<=21?'#ef4444':e.col};font-family:var(--mono);">${e.days}d</div>
+        </div></a>`;
+    });
+  }
+
+  // Today events
+  const todayEvs = WEEK_EVENTS[dayKey]||[];
+  if(todayEvs.length){
+    document.getElementById('today-section').style.display='block';
+    const wrap = document.getElementById('today-events');
+    todayEvs.forEach(ev=>{
+      wrap.innerHTML += `<a href="${ev.href}" style="padding:6px 12px;border-radius:3px;border:1px solid ${ev.col}44;background:${ev.col}0d;color:${ev.col};font-size:11px;font-weight:700;text-decoration:none;font-family:var(--sans);letter-spacing:0.5px;">${ev.label}</a>`;
+    });
+  }
+
+  // Habits
+  const habitsKey = 'habits-'+now.toDateString();
+  let habitsState = {};
+  try{ habitsState = JSON.parse(localStorage.getItem(habitsKey)||'{}'); }catch{}
+  const habitsList = document.getElementById('habits-list');
+  function renderHabits(){
+    habitsList.innerHTML='';
+    HABITS.forEach(h=>{
+      const done=!!habitsState[h.id];
+      const row=document.createElement('div');
+      row.className='habit-row'+(done?' done':'');
+      row.innerHTML=`<div class="checkbox" style="border-color:${done?h.col:'var(--border2)'};background:${done?h.col:'transparent'};">${done?'✓':''}</div>
+        <span class="habit-label" style="text-decoration:${done?'line-through':'none'};">${h.label}</span>
+        ${done?`<span class="habit-badge" style="color:${h.col};border-color:${h.col}44;">✓</span>`:''}`;
+      row.onclick=()=>{
+        habitsState[h.id]=!habitsState[h.id];
+        try{localStorage.setItem(habitsKey,JSON.stringify(habitsState));}catch{}
+        renderHabits();
+      };
+      habitsList.appendChild(row);
+    });
+    const done=Object.values(habitsState).filter(Boolean).length;
+    habitsList.insertAdjacentHTML('beforeend',`<div style="font-size:9px;color:var(--muted2);text-align:right;padding:6px 0 2px;">${done}/${HABITS.length} heute</div>`);
+  }
+  renderHabits();
+
+})();
+</script>
+{% endblock %}

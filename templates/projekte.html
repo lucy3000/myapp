@@ -1,0 +1,316 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="page">
+  <div class="page-title">Projekte</div>
+  <div class="page-sub">BEARS Raketenclub · GitHub — lucy3000</div>
+
+  <div class="tab-bar">
+    <button class="tab-btn active" onclick="showTab('bears',this)">BEARS</button>
+    <button class="tab-btn" onclick="showTab('github',this)">GitHub</button>
+  </div>
+
+  <!-- BEARS -->
+  <div class="tab-content active" id="tab-bears">
+    <div class="card" style="margin-bottom:14px;border-color:#ffffff0a;">
+      <div style="display:flex;gap:14px;align-items:center;">
+        <div style="font-size:26px;">🚀</div>
+        <div>
+          <div style="font-family:var(--display);font-size:17px;font-style:italic;font-weight:700;">BEARS</div>
+          <div style="font-size:10px;color:var(--muted2);margin-top:2px;">Di 16–21 · Do 16–22 · Avionics · Propulsion</div>
+        </div>
+      </div>
+    </div>
+    <!-- Group picker -->
+    <div style="display:flex;gap:8px;margin-bottom:14px;">
+      <button class="gym-tab active" id="grp-btn-avionics" onclick="switchGroup('avionics')" style="border-color:#60a5fa;color:#60a5fa;">◈ Avionics</button>
+      <button class="gym-tab" id="grp-btn-propulsion" onclick="switchGroup('propulsion')">✦ Propulsion</button>
+    </div>
+    <!-- Prop sub-tabs (only shown for propulsion) -->
+    <div id="prop-subtabs" style="display:none;border-bottom:1px solid var(--border2);margin-bottom:14px;">
+      <button class="tab-btn active" id="psub-tasks" onclick="switchPropSub('tasks',this)" style="font-size:10px;padding:6px 14px;font-family:var(--mono);letter-spacing:0.5px;">Aufgaben</button>
+      <button class="tab-btn" id="psub-lernplan" onclick="switchPropSub('lernplan',this)" style="font-size:10px;padding:6px 14px;font-family:var(--mono);letter-spacing:0.5px;">3-Monats-Lernplan <span id="plan-progress-label" style="font-size:9px;color:var(--muted2);"></span></button>
+    </div>
+    <!-- Tasks view -->
+    <div id="tasks-view">
+      <div style="margin-bottom:12px;" id="group-header"></div>
+      <div class="card" style="padding:0;overflow:hidden;margin-bottom:10px;" id="task-list"></div>
+      <div style="display:flex;gap:6px;margin-bottom:16px;">
+        <input class="task-input" id="new-task-input" placeholder="Neue Aufgabe..." onkeydown="if(event.key==='Enter')addTask()">
+        <button class="prio-btn" id="prio-hoch" onclick="setPrio('hoch')">hoch</button>
+        <button class="prio-btn" id="prio-mittel" onclick="setPrio('mittel')" style="border-color:#f59e0b;color:#f59e0b;">mittel</button>
+        <button class="prio-btn" id="prio-niedrig" onclick="setPrio('niedrig')">niedrig</button>
+        <button class="add-task-btn" onclick="addTask()">+ Add</button>
+      </div>
+      <div class="sec-label" id="notes-label">Notizen</div>
+      <div class="card" style="padding:10px;" id="notes-area"></div>
+    </div>
+    <!-- Lernplan view -->
+    <div id="lernplan-view" style="display:none;" id="lernplan-view"></div>
+  </div>
+
+  <!-- GITHUB -->
+  <div class="tab-content" id="tab-github">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+      <div style="font-family:var(--display);font-size:20px;font-style:italic;font-weight:700;">lucy3000</div>
+      <a href="https://github.com/lucy3000" target="_blank" style="font-size:10px;color:var(--muted2);border:1px solid var(--border);padding:4px 10px;border-radius:2px;">github.com/lucy3000 ↗</a>
+    </div>
+    <div class="card" style="margin-bottom:8px;border-color:#f973161a;">
+      <div style="display:flex;align-items:flex-start;gap:8px;margin-bottom:6px;">
+        <a href="https://github.com/lucy3000/orbital-mechanics-simulator" target="_blank" style="font-family:var(--mono);font-size:12px;font-weight:700;color:#f97316;">orbital-mechanics-simulator ↗</a>
+        <span style="font-size:8px;padding:1px 5px;border-radius:2px;border:1px solid #4ade8044;color:#4ade80;margin-left:auto;">aktiv</span>
+      </div>
+      <div style="font-size:10px;color:var(--muted2);margin-bottom:8px;line-height:1.5;">Orbitalmechanik — Keplersche Bahnen, Gravitationsfelder. Direkt relevant für BEARS-Trajectories.</div>
+      <div style="display:flex;gap:5px;flex-wrap:wrap;">
+        <span style="font-size:9px;color:#f97316;padding:1px 5px;border:1px solid #f9731633;border-radius:2px;">Python</span>
+        <span style="font-size:9px;color:var(--muted2);padding:1px 5px;border:1px solid var(--border);border-radius:2px;">Simulation</span>
+        <span style="font-size:9px;color:var(--muted2);padding:1px 5px;border:1px solid var(--border);border-radius:2px;">BEARS</span>
+      </div>
+    </div>
+    <div class="card" style="margin-bottom:8px;border-color:#60a5fa1a;">
+      <div style="display:flex;align-items:flex-start;gap:8px;margin-bottom:6px;">
+        <a href="https://github.com/lucy3000/Simulation-Gravitation" target="_blank" style="font-family:var(--mono);font-size:12px;font-weight:700;color:#60a5fa;">Simulation-Gravitation ↗</a>
+        <span style="font-size:8px;padding:1px 5px;border-radius:2px;border:1px solid #4ade8044;color:#4ade80;margin-left:auto;">aktiv</span>
+      </div>
+      <div style="font-size:10px;color:var(--muted2);margin-bottom:8px;line-height:1.5;">N-Körper Gravitationssimulation. Grundlage für Raketenflugbahn-Berechnungen.</div>
+      <div style="display:flex;gap:5px;flex-wrap:wrap;">
+        <span style="font-size:9px;color:#60a5fa;padding:1px 5px;border:1px solid #60a5fa33;border-radius:2px;">Python</span>
+        <span style="font-size:9px;color:var(--muted2);padding:1px 5px;border:1px solid var(--border);border-radius:2px;">Simulation</span>
+      </div>
+    </div>
+    <div class="card" style="margin-bottom:8px;border-color:#a78bfa1a;">
+      <div style="display:flex;align-items:flex-start;gap:8px;margin-bottom:6px;">
+        <a href="https://github.com/lucy3000/Jarvis" target="_blank" style="font-family:var(--mono);font-size:12px;font-weight:700;color:#a78bfa;">Jarvis ↗</a>
+        <span style="font-size:8px;padding:1px 5px;border-radius:2px;border:1px solid #4ade8044;color:#4ade80;margin-left:auto;">aktiv</span>
+      </div>
+      <div style="font-size:10px;color:var(--muted2);margin-bottom:8px;line-height:1.5;">Persönlicher Assistent / Automatisierungsprojekt.</div>
+      <div style="display:flex;gap:5px;flex-wrap:wrap;">
+        <span style="font-size:9px;color:#a78bfa;padding:1px 5px;border:1px solid #a78bfa33;border-radius:2px;">Python</span>
+        <span style="font-size:9px;color:var(--muted2);padding:1px 5px;border:1px solid var(--border);border-radius:2px;">AI</span>
+      </div>
+    </div>
+    <div class="card" style="margin-bottom:8px;border-color:#4ade801a;">
+      <div style="display:flex;align-items:flex-start;gap:8px;margin-bottom:6px;">
+        <a href="https://github.com/lucy3000/Seminararbeit-Neuromorphe-Computer" target="_blank" style="font-family:var(--mono);font-size:12px;font-weight:700;color:#4ade80;">Seminararbeit-Neuromorphe-Computer ↗</a>
+        <span style="font-size:8px;padding:1px 5px;border-radius:2px;border:1px solid var(--border);color:var(--muted2);margin-left:auto;">abgeschlossen</span>
+      </div>
+      <div style="font-size:10px;color:var(--muted2);margin-bottom:8px;line-height:1.5;">Seminararbeit über neuromorphes Computing.</div>
+      <div style="display:flex;gap:5px;flex-wrap:wrap;">
+        <span style="font-size:9px;color:#4ade80;padding:1px 5px;border:1px solid #4ade8033;border-radius:2px;">Python</span>
+        <span style="font-size:9px;color:var(--muted2);padding:1px 5px;border:1px solid var(--border);border-radius:2px;">Research</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function showTab(id,btn){
+  document.querySelectorAll('.tab-content').forEach(el=>{el.classList.remove('active');});
+  document.querySelectorAll('.tab-btn').forEach(b=>{b.classList.remove('active');});
+  document.getElementById('tab-'+id).classList.add('active');
+  if(btn) btn.classList.add('active');
+}
+
+const GROUP_META={
+  avionics:{name:'Avionics',sub:'Ground Station',col:'#60a5fa',icon:'◈',desc:'Entwicklung und Betrieb der Bodenstation — Telemetrie, Tracking, Kommunikation.',
+    defaultTasks:[{id:'av1',text:'Telemetrie-Protokoll dokumentieren',prio:'hoch'},{id:'av2',text:'Ground Station GUI testen',prio:'hoch'},{id:'av3',text:'RF-Link Budget berechnen',prio:'mittel'},{id:'av4',text:'Failsafe-Logic reviewen',prio:'mittel'},{id:'av5',text:'Sensor-Kalibrierung prüfen',prio:'niedrig'}]},
+  propulsion:{name:'Propulsion',sub:'Antriebssysteme',col:'#f97316',icon:'✦',desc:'Design und Test von Raketentriebwerken — Thrust, Brennkammer, Düsengeometrie.',
+    defaultTasks:[{id:'pr1',text:'Schubkurve letzte Brennkammer auswerten',prio:'hoch'},{id:'pr2',text:'Neue Düsengeometrie simulieren',prio:'hoch'},{id:'pr3',text:'Teststand-Sicherheitsprotokoll aktualisieren',prio:'mittel'},{id:'pr4',text:'Treibstoffdaten dokumentieren',prio:'niedrig'}]},
+};
+const PRIO_COL={hoch:'#ef4444',mittel:'#f59e0b',niedrig:'#52526a'};
+
+const PROP_PHASES=[
+  {id:'p1',title:'Phase 1 — Grundlagen',col:'#60a5fa',weeks:[
+    {id:'w1',week:'Woche 1',title:'Raketenprinzipien',topics:['Impulserhaltung & Newton III','Tsiolkowski-Raketengleichung','Schub, Isp, Delta-v','Massenstrom & Ausströmgeschwindigkeit'],resources:['Sutton & Biblarz — Kap. 1–2','MIT OCW 16.50 — Lecture 1–3']},
+    {id:'w2',week:'Woche 2',title:'Thermodynamik der Düsenströmung',topics:['Isentrope Prozesse','Mach-Zahl & Schallgeschwindigkeit','Düsentypen','Ideales & reales Gas'],resources:['Sutton & Biblarz — Kap. 3','Cantwell AA283 — Kap. 2–4']},
+    {id:'w3',week:'Woche 3',title:'Antriebsarten im Überblick',topics:['Festtreibstoff (SRM)','Flüssigkeitsantrieb (LRE)','Hybridantriebe','Elektrische Antriebe'],resources:['Sutton & Biblarz — Kap. 4, 6, 15','MIT OCW 16.512 — Lecture 1–4']},
+    {id:'w4',week:'Woche 4',title:'Treibstoffchemie & Isp',topics:['Oxidatoren: LOX, N₂O, HNO₃','Brennstoffe: HTPB, Paraffin, RP-1','Spezifischer Impuls berechnen','CEA / CEARUN Simulation'],resources:['NASA SP-8064','CEARUN: cearun.grc.nasa.gov']},
+  ]},
+  {id:'p2',title:'Phase 2 — Antriebssysteme',col:'#f97316',weeks:[
+    {id:'w5',week:'Woche 5',title:'Festtreibstoff-Motoren (SRM)',topics:['Grain Design: BATES, star','Interne Ballistik','Abbrandrate (r = a·pⁿ)','Kammerdruckverlauf'],resources:['NASA SP-8076','NASA SP-8115']},
+    {id:'w6',week:'Woche 6',title:'Flüssigtriebwerke (LRE)',topics:['Injektortypen: Pintle, Swirl','Regenerative Kühlung','Turbo-Pumpen','Combustion stability'],resources:['Sutton & Biblarz — Kap. 8–9','MIT OCW 16.512 — Lecture 8–12']},
+    {id:'w7',week:'Woche 7',title:'Hybridantriebe',topics:['Regressionsraten','Paraffin als liquefying fuel','N₂O als Oxidator','Hybriddesign-Parameter'],resources:['NASA CR-183975','Zilliac et al. — Paraffin Hybrid Fuels']},
+    {id:'w8',week:'Woche 8',title:'Düsendesign',topics:['Halsquerschnitt berechnen','Expansionsverhältnis','Konturformen: konisch, bell, aerospike','Fertigungs- & Materialaspekte'],resources:['NASA SP-8115','Sutton & Biblarz — Kap. 3.3–3.5']},
+  ]},
+  {id:'p3',title:'Phase 3 — Design & Tests',col:'#4ade80',weeks:[
+    {id:'w9',week:'Woche 9',title:'Simulation & CFD-Tools',topics:['CEARUN — Thermochemie','RPA','OpenRocket','Ergebnisse validieren'],resources:['CEARUN: cearun.grc.nasa.gov','RPA: propulsion-analysis.com']},
+    {id:'w10',week:'Woche 10',title:'Teststand & Messtechnik',topics:['Kraft- & Drucksensoren','DAQ & Abtastrate','Sicherheitsprotokoll','Statischer Brenntest'],resources:['BEARS Sicherheitsprotokoll','Sutton & Biblarz — Kap. 20']},
+    {id:'w11',week:'Woche 11',title:'Performance-Analyse',topics:['Charakteristische Geschwindigkeit c*','Schubkoeffizient Cf','Messungen vs. Simulation','Losses analysieren'],resources:['Cantwell AA283 — Kap. 6–7','MIT OCW 16.512 — Lecture 14–16']},
+    {id:'w12',week:'Woche 12',title:'Abschluss-Projekt & Dokumentation',topics:['Eigenes Triebwerkskonzept','CEARUN + RPA durchrechnen','Technischer Bericht','Präsentation vorbereiten'],resources:['Alle bisherigen Quellen','NASA Technical Report Format']},
+  ]},
+];
+
+let activeGroup='avionics', propSub='tasks', expandedPhase='p1';
+let tasksDone={}, tasksData={}, notesData={}, planDone={};
+
+function loadStorage(){
+  try{tasksDone=JSON.parse(localStorage.getItem('bears-done')||'{}');}catch{}
+  try{
+    const t=JSON.parse(localStorage.getItem('bears-tasks')||'null');
+    tasksData=t||{avionics:[...GROUP_META.avionics.defaultTasks],propulsion:[...GROUP_META.propulsion.defaultTasks]};
+  }catch{tasksData={avionics:[...GROUP_META.avionics.defaultTasks],propulsion:[...GROUP_META.propulsion.defaultTasks]};}
+  try{notesData=JSON.parse(localStorage.getItem('bears-notes')||'{}');}catch{}
+  try{planDone=JSON.parse(localStorage.getItem('prop-plan-done')||'{}');}catch{}
+}
+function save(){
+  try{localStorage.setItem('bears-done',JSON.stringify(tasksDone));
+      localStorage.setItem('bears-tasks',JSON.stringify(tasksData));
+      localStorage.setItem('bears-notes',JSON.stringify(notesData));
+      localStorage.setItem('prop-plan-done',JSON.stringify(planDone));}catch{}
+}
+
+let newTaskPrio='mittel';
+function setPrio(p){
+  newTaskPrio=p;
+  ['hoch','mittel','niedrig'].forEach(x=>{
+    const b=document.getElementById('prio-'+x);
+    b.style.borderColor=x===p?PRIO_COL[x]:'';
+    b.style.color=x===p?PRIO_COL[x]:'';
+  });
+}
+
+function addTask(){
+  const inp=document.getElementById('new-task-input');
+  const text=inp.value.trim();
+  if(!text) return;
+  const id='custom-'+Date.now();
+  tasksData[activeGroup].push({id,text,prio:newTaskPrio});
+  save(); inp.value=''; renderTasks();
+}
+function deleteTask(id){
+  tasksData[activeGroup]=tasksData[activeGroup].filter(t=>t.id!==id);
+  delete tasksDone[id]; save(); renderTasks();
+}
+function toggleTask(id){tasksDone[id]=!tasksDone[id];save();renderTasks();}
+function cyclePrio(id){
+  const order=['hoch','mittel','niedrig'];
+  const t=tasksData[activeGroup].find(t=>t.id===id);
+  if(t){t.prio=order[(order.indexOf(t.prio)+1)%3];save();renderTasks();}
+}
+
+function renderTasks(){
+  const g=GROUP_META[activeGroup];
+  const sorted=[...tasksData[activeGroup]].sort((a,b)=>['hoch','mittel','niedrig'].indexOf(a.prio)-['hoch','mittel','niedrig'].indexOf(b.prio));
+  const doneCount=sorted.filter(t=>tasksDone[t.id]).length;
+  const pct=sorted.length?Math.round((doneCount/sorted.length)*100):0;
+  document.getElementById('group-header').innerHTML=`
+    <div style="font-family:var(--display);font-size:17px;font-style:italic;font-weight:700;color:${g.col};margin-bottom:3px;">${g.name} — ${g.sub}</div>
+    <div style="font-size:10px;color:var(--muted2);margin-bottom:6px;">${g.desc}</div>
+    <div style="display:flex;gap:8px;align-items:center;">
+      <div style="height:2px;flex:1;background:var(--border);border-radius:1px;overflow:hidden;"><div style="height:100%;background:${g.col};width:${pct}%;transition:width 0.4s;"></div></div>
+      <span style="font-size:10px;color:${g.col};">${doneCount}/${sorted.length}</span>
+    </div>`;
+  const tl=document.getElementById('task-list');
+  tl.innerHTML='';
+  if(!sorted.length){tl.innerHTML='<div style="padding:14px;font-size:11px;color:var(--muted2);text-align:center;">Keine Aufgaben — füge eine hinzu ↓</div>';return;}
+  sorted.forEach(task=>{
+    const isDone=!!tasksDone[task.id];
+    const row=document.createElement('div');
+    row.style.cssText=`display:flex;align-items:center;gap:8px;padding:8px 12px;border-bottom:1px solid var(--border);opacity:${isDone?0.35:1};transition:opacity 0.15s;`;
+    row.innerHTML=`<div class="checkbox" style="border-color:${isDone?g.col:'var(--border2)'};background:${isDone?g.col:'transparent'};cursor:pointer;" onclick="toggleTask('${task.id}')">${isDone?'✓':''}</div>
+      <span style="flex:1;font-size:11px;text-decoration:${isDone?'line-through':'none'};">${task.text}</span>
+      <span onclick="cyclePrio('${task.id}')" style="font-size:8px;padding:1px 5px;border-radius:2px;border:1px solid ${PRIO_COL[task.prio]}44;color:${PRIO_COL[task.prio]};cursor:pointer;">${task.prio}</span>
+      <span onclick="deleteTask('${task.id}')" style="font-size:12px;color:var(--muted);cursor:pointer;line-height:1;">×</span>`;
+    tl.appendChild(row);
+  });
+  document.getElementById('notes-label').textContent='Notizen — '+g.name;
+  const na=document.getElementById('notes-area');
+  const note=notesData[activeGroup]||'';
+  na.innerHTML=`<div onclick="editNote()" style="font-size:11px;color:${note?'var(--text)':'var(--muted2)'};cursor:text;min-height:40px;line-height:1.6;white-space:pre-wrap;">${note||'Klicken zum Bearbeiten...'}</div>`;
+}
+
+function editNote(){
+  const g=GROUP_META[activeGroup];
+  const na=document.getElementById('notes-area');
+  na.innerHTML=`<textarea autofocus style="width:100%;min-height:80px;background:transparent;border:none;color:var(--text);font-family:var(--mono);font-size:11px;resize:vertical;outline:none;line-height:1.6;">${notesData[activeGroup]||''}</textarea>`;
+  const ta=na.querySelector('textarea');
+  ta.focus();
+  ta.onblur=()=>{notesData[activeGroup]=ta.value;save();renderTasks();};
+}
+
+function switchGroup(id){
+  activeGroup=id;
+  Object.keys(GROUP_META).forEach(k=>{
+    const b=document.getElementById('grp-btn-'+k);
+    const g=GROUP_META[k];
+    b.classList.toggle('active',k===id);
+    b.style.borderColor=k===id?g.col:'';
+    b.style.color=k===id?g.col:'';
+  });
+  document.getElementById('prop-subtabs').style.display=id==='propulsion'?'flex':'none';
+  if(id==='propulsion') switchPropSub(propSub);
+  else{document.getElementById('tasks-view').style.display='';document.getElementById('lernplan-view').style.display='none';}
+  renderTasks();
+}
+
+function switchPropSub(sub,btn){
+  propSub=sub;
+  ['tasks','lernplan'].forEach(s=>{
+    const b=document.getElementById('psub-'+s);
+    b.classList.toggle('active',s===sub);
+  });
+  if(sub==='tasks'){
+    document.getElementById('tasks-view').style.display='';
+    document.getElementById('lernplan-view').style.display='none';
+    renderTasks();
+  } else {
+    document.getElementById('tasks-view').style.display='none';
+    document.getElementById('lernplan-view').style.display='';
+    renderLernplan();
+  }
+}
+
+function renderLernplan(){
+  const allIds=PROP_PHASES.flatMap(p=>p.weeks.map(w=>w.id));
+  const doneCount=allIds.filter(id=>planDone[id]).length;
+  document.getElementById('plan-progress-label').textContent=doneCount+'/'+allIds.length;
+  let html=`<div style="margin-bottom:16px;">
+    <div style="font-family:var(--display);font-size:18px;font-style:italic;font-weight:700;color:#f97316;margin-bottom:4px;">Propulsion — 3-Monats-Lernplan</div>
+    <div style="font-size:10px;color:var(--muted2);margin-bottom:10px;line-height:1.6;">12 Wochen · Grundlagen → Systeme → Design & Tests</div>
+    <div style="display:flex;gap:10px;align-items:center;">
+      <div style="flex:1;height:3px;background:var(--border);border-radius:2px;overflow:hidden;"><div style="height:100%;background:#f97316;width:${(doneCount/allIds.length)*100}%;transition:width 0.4s;"></div></div>
+      <span style="font-size:10px;color:#f97316;">${doneCount} / ${allIds.length} Wochen</span>
+    </div></div>`;
+  PROP_PHASES.forEach(phase=>{
+    const pd=phase.weeks.filter(w=>planDone[w.id]).length;
+    const exp=expandedPhase===phase.id;
+    html+=`<div style="margin-bottom:10px;">
+      <div onclick="togglePhase('${phase.id}')" style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--card);border:1px solid ${phase.col}22;border-radius:4px;cursor:pointer;">
+        <div style="width:8px;height:8px;border-radius:50%;background:${phase.col};flex-shrink:0;"></div>
+        <div style="flex:1;"><div style="font-family:var(--sans);font-size:12px;font-weight:700;color:var(--accent);">${phase.title}</div><div style="font-size:9px;color:var(--muted2);margin-top:2px;">${phase.weeks.length} Wochen</div></div>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <div style="height:2px;width:60px;background:var(--border);border-radius:1px;overflow:hidden;"><div style="height:100%;background:${phase.col};width:${(pd/phase.weeks.length)*100}%;"></div></div>
+          <span style="font-size:9px;color:${phase.col};">${pd}/${phase.weeks.length}</span>
+          <span style="font-size:10px;color:var(--muted2);">${exp?'▲':'▼'}</span>
+        </div>
+      </div>`;
+    if(exp){
+      html+=`<div style="border-left:2px solid ${phase.col}33;margin-left:14px;padding-left:14px;margin-top:6px;">`;
+      phase.weeks.forEach(week=>{
+        const wd=!!planDone[week.id];
+        html+=`<div class="card" style="margin-bottom:8px;border-color:${wd?phase.col+'44':'var(--border)'};opacity:${wd?0.6:1};transition:opacity 0.2s;">
+          <div style="display:flex;align-items:flex-start;gap:10px;">
+            <div class="checkbox" style="margin-top:2px;flex-shrink:0;cursor:pointer;border-color:${wd?phase.col:'var(--border2)'};background:${wd?phase.col:'transparent'};" onclick="togglePlanWeek('${week.id}')">${wd?'✓':''}</div>
+            <div style="flex:1;">
+              <div style="display:flex;gap:8px;align-items:baseline;margin-bottom:6px;">
+                <span style="font-size:9px;color:${phase.col};font-family:var(--mono);">${week.week}</span>
+                <span style="font-size:12px;font-weight:700;color:var(--accent);font-family:var(--sans);">${week.title}</span>
+              </div>
+              <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px;">${week.topics.map(t=>`<span style="font-size:9px;color:var(--muted2);padding:2px 6px;border:1px solid var(--border);border-radius:2px;">${t}</span>`).join('')}</div>
+              <div style="font-size:9px;color:var(--muted2);line-height:1.6;"><span style="color:${phase.col};">→ </span>${week.resources.join(' · ')}</div>
+            </div>
+          </div></div>`;
+      });
+      html+='</div>';
+    }
+    html+='</div>';
+  });
+  document.getElementById('lernplan-view').innerHTML=html;
+}
+
+function togglePhase(id){expandedPhase=expandedPhase===id?null:id;renderLernplan();}
+function togglePlanWeek(id){planDone[id]=!planDone[id];save();renderLernplan();}
+
+loadStorage();
+renderTasks();
+</script>
+{% endblock %}

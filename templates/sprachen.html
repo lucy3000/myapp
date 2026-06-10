@@ -1,0 +1,211 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="page">
+  <div class="page-title">Sprachen</div>
+  <div class="page-sub">Spanisch · Russisch · 3-Monats-Pläne</div>
+
+  <!-- Language picker -->
+  <div style="display:flex;gap:8px;margin-bottom:16px;">
+    <button id="lang-btn-es" onclick="switchLang('es')" style="padding:8px 18px;background:transparent;border:1px solid #f97316;color:#f97316;border-radius:3px;font-family:var(--sans);font-size:13px;font-weight:700;letter-spacing:1px;transition:all 0.15s;cursor:pointer;">🇪🇸 Spanisch</button>
+    <button id="lang-btn-ru" onclick="switchLang('ru')" style="padding:8px 18px;background:transparent;border:1px solid var(--border2);color:var(--muted2);border-radius:3px;font-family:var(--sans);font-size:13px;font-weight:700;letter-spacing:1px;transition:all 0.15s;cursor:pointer;">🇷🇺 Russisch</button>
+  </div>
+
+  <div class="tab-bar" style="margin-bottom:18px;">
+    <button class="tab-btn active" onclick="showView('plan',this)">3-Monats-Plan</button>
+    <button class="tab-btn" onclick="showView('resources',this)">Ressourcen</button>
+  </div>
+
+  <div id="view-plan"></div>
+  <div id="view-resources" style="display:none;"></div>
+</div>
+
+<script>
+const LANG_META={
+  es:{flag:'🇪🇸',name:'Spanisch',col:'#f97316',note:'3 Monate · B1-Ziel · 30–45 min täglich'},
+  ru:{flag:'🇷🇺',name:'Russisch', col:'#60a5fa',note:'3 Monate · A2-Ziel · 30–45 min täglich'},
+};
+const ES_PHASES=[
+  {id:'es-p1',title:'Phase 1 — Grundlagen',col:'#f97316',weeks:[
+    {id:'es-w1',week:'Woche 1',title:'Aussprache & Alphabet',topics:['Spanisches Alphabet','Vokale: klare Aussprache','ll, rr, ñ, h, j meistern','Betonung & Akzentzeichen'],resources:['Language Transfer Spanisch — Audio 1–10','Dreaming Spanish: Komprehensives Input — 1h']},
+    {id:'es-w2',week:'Woche 2',title:'Presente & Grundvokabular',topics:['Presente de indicativo: -ar, -er, -ir','ser vs. estar','100 häufigste spanische Wörter (Anki)','Zahlen, Farben, Wochentage'],resources:['Language Transfer — Audio 11–25','Anki: Spanish Top 2000 Words']},
+    {id:'es-w3',week:'Woche 3',title:'Erste Gespräche',topics:['Begrüßung, Vorstellung','Unregelmäßige Verben: ir, ser, estar','Artikel: el/la/los/las','Pronomen'],resources:['Language Transfer — Audio 26–40','Dreaming Spanish Beginner Playlist']},
+    {id:'es-w4',week:'Woche 4',title:'Alltagssituationen',topics:['Einkaufen, Restaurant, Unterwegs','Possessivpronomen','Gustar-Konstruktion','200-Wörter-Test'],resources:['Language Transfer — Audio 41–50','Dreaming Spanish: Intermediate Beginner']},
+  ]},
+  {id:'es-p2',title:'Phase 2 — Kommunikation',col:'#a78bfa',weeks:[
+    {id:'es-w5',week:'Woche 5',title:'Pretérito Indefinido',topics:['Reguläre Formen','Unregelmäßige Verben: fui, hice, tuve','Signalwörter: ayer, la semana pasada','Kurze Texte schreiben'],resources:['Study Spanish: Preterite Guide','Spanisch mit Miriam — Pretérito']},
+    {id:'es-w6',week:'Woche 6',title:'Pretérito Imperfecto',topics:['Formen -aba, -ía','Indefinido vs. Imperfecto','Erzählungen kombinieren','Hörverständnis: Podcasts'],resources:['Podcast: Españolistos','Coffee Break Spanish Staffel 2']},
+    {id:'es-w7',week:'Woche 7',title:'Zukunft & Konditional',topics:['Futuro Simple','Condicional Simple','Ir a + Infinitivo','Wenn-dann-Sätze'],resources:['Dreaming Spanish: Upper Intermediate','Schreiben: eigene Zukunftspläne']},
+    {id:'es-w8',week:'Woche 8',title:'Konversationspraxis',topics:['Tandem-Partner suchen','Alltägliche Gespräche üben','Leseverständnis','Grammatikfehler analysieren'],resources:['italki.com — Community Tutor','News in Slow Spanish']},
+  ]},
+  {id:'es-p3',title:'Phase 3 — Fortgeschritten',col:'#4ade80',weeks:[
+    {id:'es-w9',week:'Woche 9',title:'Subjuntivo',topics:['Presente de Subjuntivo bilden','Verwendung: Wünsche, Emotionen','Que + Subjuntivo','Espero que..., Quiero que...'],resources:['StudySpanish.com — Subjunctive Guide','Spanisch mit Miriam — Subjuntivo']},
+    {id:'es-w10',week:'Woche 10',title:'Komplexe Grammatik',topics:['Reflexive Verben','Por vs. Para','Ser vs. Estar vertiefen','Satzverbindungen'],resources:['Assimil Spanisch — Lektionen 60–80','SpanishPod101 Advanced']},
+    {id:'es-w11',week:'Woche 11',title:'Immersion & Lesen',topics:['Spanisches Buch lesen','Spanische Serien','Täglich 30 min nur Spanisch','Vokabular aus Kontext'],resources:['Dreaming Spanish: Intermediate/Advanced','Extra en Español']},
+    {id:'es-w12',week:'Woche 12',title:'Abschluss & Niveau-Test',topics:['DELE A2/B1 Probeklausur','Freies Schreiben','Tandem-Gespräch: 30 min','Lernplan für nächste 3 Monate'],resources:['Instituto Cervantes — DELE Probetest','Tandem App']},
+  ]},
+];
+const RU_PHASES=[
+  {id:'ru-p1',title:'Phase 1 — Kyrillisch & Grundlagen',col:'#60a5fa',weeks:[
+    {id:'ru-w1',week:'Woche 1',title:'Kyrillisches Alphabet',topics:['Kyrillische Buchstaben in 3 Tagen','Buchstaben wie Latein: А, Е, О','Falsche Freunde: Р=R, Н=N','Einfache Wörter lesen'],resources:['Russian with Anastasia — Alphabet','Anki: Russian Alphabet Deck']},
+    {id:'ru-w2',week:'Woche 2',title:'Aussprache & erste Sätze',topics:['Vokalreduktion','Konsonantenhärtung','Привет / Здравствуйте / Спасибо','Ich bin... / Das ist...'],resources:['Russian with Anastasia — Aussprache','Language Transfer Russian']},
+    {id:'ru-w3',week:'Woche 3',title:'Grundvokabular & Präsens',topics:['200 häufigste russische Wörter','Verbkonjugation Präsens','Zahlen 1–100','Farben, Wochentage, Monate'],resources:['Anki: Russian Top 1000 Frequency','LiveRussian — Basic Vocabulary']},
+    {id:'ru-w4',week:'Woche 4',title:'Kasussystem — Einführung',topics:['6 Kasus verstehen','Nominativ & Akkusativ','Maskulin / Feminin / Neutrum','Erste Sätze mit Kasus'],resources:['Russian Grammar Table (russianlessons.net)','Anastasia: Kasus-Playlist']},
+  ]},
+  {id:'ru-p2',title:'Phase 2 — Grammatik',col:'#f97316',weeks:[
+    {id:'ru-w5',week:'Woche 5',title:'Kasus I — Genitiv & Dativ',topics:['Genitiv: нет + Genitiv','Dativ: мне нравится','Deklinationstabellen','Präpositionen mit festem Kasus'],resources:['russianlessons.net — Cases Guide','Anki: Russian Cases Deck']},
+    {id:'ru-w6',week:'Woche 6',title:'Kasus II — Instrumental & Präpositional',topics:['Instrumental: с другом','Beruf/Eigenschaft ohne Verb sein','Präpositional: über etwas reden','Wo-Fragen: в/на'],resources:['Master Russian — Cases','Russian Grammar in Use']},
+    {id:'ru-w7',week:'Woche 7',title:'Verbaspekte',topics:['Perfektiv vs. Imperfektiv','Vollendete vs. andauernde Handlung','Aspektpaare lernen','Vergangenheit bilden'],resources:['Anastasia: Verbal Aspects Explained','Russlandjournals.com']},
+    {id:'ru-w8',week:'Woche 8',title:'Vergangenheit & Zukunft',topics:['Vergangenheitsform aller Verbtypen','Einfache Zukunft: буду + Infinitiv','Komplexe Zukunft','Kurzgeschichten lesen'],resources:['Slow Russian Podcast','Anki: Russische Verben Top 200']},
+  ]},
+  {id:'ru-p3',title:'Phase 3 — Praxis & Immersion',col:'#4ade80',weeks:[
+    {id:'ru-w9',week:'Woche 9',title:'Lesen & Hörverständnis',topics:['Kinderbücher auf Russisch','Russische Nachrichten','Slow Russian Podcast: 1 Folge/Tag','Wörter aus Kontext erschließen'],resources:['Slow Russian: slowrussian.net','BBC Russian']},
+    {id:'ru-w10',week:'Woche 10',title:'Sprechen & Schreiben',topics:['Tandem-Partner suchen','30 min Gespräch auf Russisch','Tagebuch schreiben (5 Sätze/Tag)','Aussprache korrigieren'],resources:['iTalki: russische Tutor*innen','HelloTalk App']},
+    {id:'ru-w11',week:'Woche 11',title:'Erweitertes Vokabular',topics:['Themenvokabular: Technik, Wissenschaft','Idiome und feste Ausdrücke','Russische Sprichwörter','Lesen: Kurzgeschichten'],resources:['Anki: Advanced Russian Vocabulary','Elementary Russian Reader']},
+    {id:'ru-w12',week:'Woche 12',title:'Abschluss & Selbstbewertung',topics:['TORFL A1/A2 Probetest','Freies Schreiben: Brief','Film ohne Untertitel: 15 min','Lernplan für Monat 4–6'],resources:['TORFL Probetest: test.ru','Film: Ирония судьбы']},
+  ]},
+];
+const LANG_RESOURCES={
+  es:[
+    {cat:'Kurse (kostenlos)',col:'#f97316',items:[
+      {title:'Language Transfer — Spanisch',note:'Das beste kostenlose Spanischkurs-Audio (50 Lektionen).',url:'https://www.languagetransfer.org/spanish'},
+      {title:'Dreaming Spanish',note:'Komprehensives Input-Methode auf YouTube.',url:'https://www.youtube.com/@DreamingSpanish'},
+      {title:'Extra en Español',note:'Sitcom für Sprachlerner — perfekt für Anfänger.',url:'https://www.youtube.com/watch?v=MBKgckFKl9c'},
+    ]},
+    {cat:'Vokabular & Grammatik',col:'#a78bfa',items:[
+      {title:'Anki — Spanish Top 2000 Deck',note:'Spaced-Repetition Karten der häufigsten Wörter.',url:'https://ankiweb.net/shared/info/712832019'},
+      {title:'StudySpanish.com',note:'Gratis Grammatikerklärungen inkl. Übungen.',url:'https://studyspanish.com'},
+    ]},
+    {cat:'Podcasts & Medien',col:'#4ade80',items:[
+      {title:'Coffee Break Spanish',note:'Strukturierter Podcast von A1–B2.',url:'https://coffeebreaklanguages.com/coffeebreakspanish/'},
+      {title:'News in Slow Spanish',note:'Aktuelle Nachrichten in langsamem Spanisch.',url:'https://www.newsinslowspanish.com'},
+    ]},
+    {cat:'Konversation',col:'#22d3ee',items:[
+      {title:'iTalki',note:'Community Tutor*innen ab ~8€/h.',url:'https://www.italki.com'},
+      {title:'Tandem App',note:'Sprachtausch mit Native Speakers.',url:'https://www.tandem.net'},
+    ]},
+  ],
+  ru:[
+    {cat:'Kurse & YouTube',col:'#60a5fa',items:[
+      {title:'Russian with Anastasia',note:'Beste YouTube-Kanal für Russisch — Alphabet, Grammatik, Aussprache.',url:'https://www.youtube.com/@RussianWithAnastasia'},
+      {title:'Live Russian',note:'Natürliches Russisch aus dem Alltag.',url:'https://www.youtube.com/@LiveRussian'},
+    ]},
+    {cat:'Vokabular & Anki',col:'#a78bfa',items:[
+      {title:'Anki — Russian Frequency Deck',note:'Top 1000 russische Wörter mit Audio.',url:'https://ankiweb.net/shared/info/1420786875'},
+      {title:'masterrussian.com',note:'Gratis Grammatikerklärungen: Kasus, Verben, Aspekte.',url:'https://masterrussian.com'},
+    ]},
+    {cat:'Hören & Lesen',col:'#4ade80',items:[
+      {title:'Slow Russian Podcast',note:'Kurze Episoden zu Alltagsthemen — langsam gesprochen.',url:'https://www.slowrussian.net'},
+      {title:'BBC Russian',note:'Echte russische Nachrichten.',url:'https://www.bbc.com/russian'},
+    ]},
+    {cat:'Konversation & Test',col:'#22d3ee',items:[
+      {title:'iTalki — Russische Tutor*innen',note:'Russische Native Speakers ab ~7€/h.',url:'https://www.italki.com/en/teachers/russian'},
+      {title:'TORFL Probetest',note:'Offizielles russisches Sprachniveau-Zertifikat.',url:'http://www.torfl.ru/english'},
+    ]},
+  ],
+};
+
+let currentLang='es', currentView='plan', expandedPhase='es-p1';
+let planDone={};
+try{planDone=JSON.parse(localStorage.getItem('lang-plan-done')||'{}');}catch{}
+function savePlan(){try{localStorage.setItem('lang-plan-done',JSON.stringify(planDone));}catch{}}
+
+function showView(id,btn){
+  currentView=id;
+  document.getElementById('view-plan').style.display=id==='plan'?'':'none';
+  document.getElementById('view-resources').style.display=id==='resources'?'':'none';
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  if(id==='plan') renderPlan(); else renderResources();
+}
+
+function switchLang(l){
+  currentLang=l;
+  expandedPhase=l+'-p1';
+  Object.keys(LANG_META).forEach(k=>{
+    const b=document.getElementById('lang-btn-'+k);
+    const m=LANG_META[k];
+    b.style.borderColor=k===l?m.col:'var(--border2)';
+    b.style.color=k===l?m.col:'var(--muted2)';
+  });
+  if(currentView==='plan') renderPlan(); else renderResources();
+}
+
+function renderPlan(){
+  const meta=LANG_META[currentLang];
+  const phases=currentLang==='es'?ES_PHASES:RU_PHASES;
+  const allIds=phases.flatMap(p=>p.weeks.map(w=>w.id));
+  const doneCount=allIds.filter(id=>planDone[id]).length;
+  let html=`<div style="margin-bottom:16px;">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;">
+      <span style="font-size:22px;">${meta.flag}</span>
+      <div style="font-family:var(--display);font-size:18px;font-style:italic;font-weight:700;color:${meta.col};">${meta.name} — 3-Monats-Lernplan</div>
+    </div>
+    <div style="font-size:10px;color:var(--muted2);margin-bottom:10px;">${meta.note}</div>
+    <div style="display:flex;gap:10px;align-items:center;">
+      <div style="flex:1;height:3px;background:var(--border);border-radius:2px;overflow:hidden;"><div style="height:100%;background:${meta.col};width:${(doneCount/allIds.length)*100}%;transition:width 0.4s;"></div></div>
+      <span style="font-size:10px;color:${meta.col};">${doneCount} / ${allIds.length} Wochen</span>
+    </div></div>`;
+  phases.forEach(phase=>{
+    const pd=phase.weeks.filter(w=>planDone[w.id]).length;
+    const exp=expandedPhase===phase.id;
+    html+=`<div style="margin-bottom:10px;">
+      <div onclick="togglePhase('${phase.id}')" style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--card);border:1px solid ${phase.col}22;border-radius:4px;cursor:pointer;">
+        <div style="width:8px;height:8px;border-radius:50%;background:${phase.col};flex-shrink:0;"></div>
+        <div style="flex:1;"><div style="font-family:var(--sans);font-size:12px;font-weight:700;color:var(--accent);">${phase.title}</div><div style="font-size:9px;color:var(--muted2);margin-top:2px;">${phase.weeks.length} Wochen</div></div>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <div style="height:2px;width:60px;background:var(--border);border-radius:1px;overflow:hidden;"><div style="height:100%;background:${phase.col};width:${(pd/phase.weeks.length)*100}%;"></div></div>
+          <span style="font-size:9px;color:${phase.col};">${pd}/${phase.weeks.length}</span>
+          <span style="font-size:10px;color:var(--muted2);">${exp?'▲':'▼'}</span>
+        </div>
+      </div>`;
+    if(exp){
+      html+=`<div style="border-left:2px solid ${phase.col}33;margin-left:14px;padding-left:14px;margin-top:6px;">`;
+      phase.weeks.forEach(week=>{
+        const wd=!!planDone[week.id];
+        html+=`<div class="card" style="margin-bottom:8px;border-color:${wd?phase.col+'44':'var(--border)'};opacity:${wd?0.6:1};transition:opacity 0.2s;">
+          <div style="display:flex;align-items:flex-start;gap:10px;">
+            <div class="checkbox" style="margin-top:2px;flex-shrink:0;cursor:pointer;border-color:${wd?phase.col:'var(--border2)'};background:${wd?phase.col:'transparent'};" onclick="toggleWeek('${week.id}')">${wd?'✓':''}</div>
+            <div style="flex:1;">
+              <div style="display:flex;gap:8px;align-items:baseline;margin-bottom:6px;">
+                <span style="font-size:9px;color:${phase.col};font-family:var(--mono);">${week.week}</span>
+                <span style="font-size:12px;font-weight:700;color:var(--accent);font-family:var(--sans);">${week.title}</span>
+              </div>
+              <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px;">${week.topics.map(t=>`<span style="font-size:9px;color:var(--muted2);padding:2px 6px;border:1px solid var(--border);border-radius:2px;">${t}</span>`).join('')}</div>
+              <div style="font-size:9px;color:var(--muted2);line-height:1.6;"><span style="color:${phase.col};">→ </span>${week.resources.join(' · ')}</div>
+            </div>
+          </div></div>`;
+      });
+      html+='</div>';
+    }
+    html+='</div>';
+  });
+  document.getElementById('view-plan').innerHTML=html;
+}
+
+function togglePhase(id){expandedPhase=expandedPhase===id?null:id;renderPlan();}
+function toggleWeek(id){planDone[id]=!planDone[id];savePlan();renderPlan();}
+
+function renderResources(){
+  const meta=LANG_META[currentLang];
+  const resources=LANG_RESOURCES[currentLang];
+  let html=`<div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;">
+    <span style="font-size:18px;">${meta.flag}</span>
+    <div style="font-family:var(--display);font-size:17px;font-style:italic;font-weight:700;color:${meta.col};">${meta.name} — Ressourcen & Links</div>
+  </div>`;
+  resources.forEach(cat=>{
+    html+=`<div style="margin-bottom:16px;">
+      <div style="font-family:var(--sans);font-size:11px;font-weight:700;color:${cat.col};letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;">${cat.cat}</div>`;
+    cat.items.forEach(item=>{
+      html+=`<div class="card" style="margin-bottom:6px;border-color:${cat.col}1a;padding:10px 14px;">
+        <a href="${item.url}" target="_blank" style="font-family:var(--mono);font-size:11px;font-weight:700;color:${cat.col};text-decoration:none;display:block;margin-bottom:4px;">${item.title} ↗</a>
+        <div style="font-size:10px;color:var(--muted2);line-height:1.5;">${item.note}</div>
+      </div>`;
+    });
+    html+='</div>';
+  });
+  document.getElementById('view-resources').innerHTML=html;
+}
+
+renderPlan();
+</script>
+{% endblock %}
