@@ -6,6 +6,7 @@
 
   <div class="tab-bar">
     <button class="tab-btn active" onclick="showTab('bears',this)">BEARS</button>
+    <button class="tab-btn" onclick="showTab('hildegard',this)">🦾 Hildegard</button>
     <button class="tab-btn" onclick="showTab('github',this)">GitHub</button>
   </div>
 
@@ -46,6 +47,89 @@
     </div>
     <!-- Lernplan view -->
     <div id="lernplan-view" style="display:none;" id="lernplan-view"></div>
+  </div>
+
+  <!-- HILDEGARD -->
+  <div class="tab-content" id="tab-hildegard">
+
+    <!-- Header -->
+    <div class="card" style="margin-bottom:12px;border-color:#22d3ee22;background:linear-gradient(135deg,rgba(34,211,238,0.04),rgba(168,85,247,0.04));">
+      <div style="display:flex;gap:14px;align-items:flex-start;">
+        <div style="font-size:32px;line-height:1;">🦾</div>
+        <div style="flex:1;">
+          <div style="font-family:var(--display);font-size:20px;font-weight:900;letter-spacing:1px;color:var(--text);margin-bottom:2px;">HILDEGARD</div>
+          <div style="font-size:12px;color:var(--muted2);margin-bottom:8px;">6-Achs-Roboterarm · Eigendesign · Lernprojekt</div>
+          <div style="font-size:11px;color:var(--muted2);line-height:1.6;border-left:2px solid #22d3ee44;padding-left:10px;">
+            Leitprinzip: <span style="color:var(--text);font-weight:600;">Lerneffekt zuerst</span>, Leistungsfähigkeit zweitrangig, Kosten drittrangig, einfache Umsetzung am unwichtigsten.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Spec + Overall Progress -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">
+      <div class="card" style="margin:0;border-color:#a855f722;">
+        <div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#a855f7;font-weight:700;margin-bottom:10px;">Pflichtenheft</div>
+        <div style="display:grid;gap:7px;">
+          <div style="display:flex;justify-content:space-between;font-size:12px;padding-bottom:6px;border-bottom:1px solid var(--border);">
+            <span style="color:var(--muted2);">Traglast</span><span style="font-weight:700;color:#a855f7;">0,5 kg</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:12px;padding-bottom:6px;border-bottom:1px solid var(--border);">
+            <span style="color:var(--muted2);">Reichweite</span><span style="font-weight:700;color:#a855f7;">~500 mm</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:12px;padding-bottom:6px;border-bottom:1px solid var(--border);">
+            <span style="color:var(--muted2);">Achsen / DOF</span><span style="font-weight:700;color:#a855f7;">6</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:12px;">
+            <span style="color:var(--muted2);">Wiederholgenauigkeit</span><span style="font-weight:700;color:#a855f7;">±1 mm</span>
+          </div>
+        </div>
+      </div>
+      <div class="card" style="margin:0;border-color:#22d3ee22;">
+        <div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#22d3ee;font-weight:700;margin-bottom:10px;">Werkzeuge</div>
+        <div style="display:flex;flex-direction:column;gap:6px;">
+          <div style="font-size:11px;"><span style="color:#22d3ee;font-weight:600;">OS:</span> <span style="color:var(--muted2);">ROS 2 Jazzy · Ubuntu 24.04 (WSL2)</span></div>
+          <div style="font-size:11px;"><span style="color:#22d3ee;font-weight:600;">IDE:</span> <span style="color:var(--muted2);">VS Code + WSL-Extension</span></div>
+          <div style="font-size:11px;"><span style="color:#22d3ee;font-weight:600;">CAD:</span> <span style="color:var(--muted2);">Fusion 360 (CAD + FEM)</span></div>
+          <div style="font-size:11px;"><span style="color:#22d3ee;font-weight:600;">Fertigung:</span> <span style="color:var(--muted2);">3D-Druck + Kaufteile</span></div>
+          <div style="font-size:11px;"><span style="color:#22d3ee;font-weight:600;">Referenz:</span> <span style="color:var(--muted2);">AR4 (Annin Robotics)</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Overall progress bar -->
+    <div class="card" style="margin-bottom:14px;padding:12px 16px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+        <div style="font-size:12px;font-weight:700;">Gesamt-Fortschritt</div>
+        <div style="font-size:11px;color:var(--muted2);" id="hild-overall-label">0 / 0 Aufgaben</div>
+      </div>
+      <div style="height:6px;background:var(--border);border-radius:3px;overflow:hidden;">
+        <div id="hild-overall-bar" style="height:100%;background:linear-gradient(90deg,#22d3ee,#a855f7);border-radius:3px;width:0%;transition:width 0.5s;"></div>
+      </div>
+      <div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;" id="hild-phase-chips"></div>
+    </div>
+
+    <!-- Phase checklist -->
+    <div id="hild-phases"></div>
+
+    <!-- Skills section -->
+    <div class="card" style="margin-top:4px;border-color:#4ade8022;">
+      <div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#4ade80;font-weight:700;margin-bottom:10px;">Skills die du dir aneignest</div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;">
+        <span style="font-size:11px;padding:3px 10px;border:1px solid #4ade8033;color:#4ade80;border-radius:2px;">CAD · Fusion 360</span>
+        <span style="font-size:11px;padding:3px 10px;border:1px solid #f9731633;color:#f97316;border-radius:2px;">Statik & Drehmomentauslegung</span>
+        <span style="font-size:11px;padding:3px 10px;border:1px solid #a855f733;color:#a855f7;border-radius:2px;">Robotik-Mathematik (DH, IK)</span>
+        <span style="font-size:11px;padding:3px 10px;border:1px solid #22d3ee33;color:#22d3ee;border-radius:2px;">ROS 2</span>
+        <span style="font-size:11px;padding:3px 10px;border:1px solid #60a5fa33;color:#60a5fa;border-radius:2px;">Embedded / Motoransteuerung</span>
+        <span style="font-size:11px;padding:3px 10px;border:1px solid #f59e0b33;color:#f59e0b;border-radius:2px;">FEM-Simulation</span>
+      </div>
+    </div>
+
+    <!-- Project notes -->
+    <div style="margin-top:12px;">
+      <div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted2);font-weight:700;margin-bottom:7px;">Projekttagebuch / Notizen</div>
+      <div class="card" style="padding:10px;" id="hild-notes-area"></div>
+    </div>
   </div>
 
   <!-- GITHUB -->
@@ -312,5 +396,191 @@ function togglePlanWeek(id){planDone[id]=!planDone[id];save();renderLernplan();}
 
 loadStorage();
 renderTasks();
+
+/* ═══════════════════════════════════════════════════════════════
+   HILDEGARD — 6-Achs-Roboterarm
+═══════════════════════════════════════════════════════════════ */
+const HILD_PHASES = [
+  { id:'h0', title:'Phase 0 — Vorbereitung', col:'#22d3ee', duration:'1–3 Wochen',
+    milestone:'Motor per Code bewegen + Kinematik erklären können',
+    tasks:[
+      {id:'h0-1', text:'VS Code mit WSL-Extension einrichten (ROS 2 Jazzy auf Ubuntu 24.04)'},
+      {id:'h0-2', text:'Ersten ROS-2-Publisher/Subscriber in Python schreiben und laufen lassen'},
+      {id:'h0-3', text:'Kinematik-Grundlagen: Freiheitsgrade, Vorwärts- vs. inverse Kinematik, DH-Parameter'},
+      {id:'h0-4', text:'Statik: Drehmoment = Kraft × Hebelarm, Schwerpunkt, statisches Gleichgewicht'},
+      {id:'h0-5', text:'AR4-Dokumentation komplett durchlesen (CAD, Stückliste, Anleitung) — nur Referenz'},
+      {id:'h0-6', text:'Einzelnen Stepper-Motor mit Treiber auf dem Tisch ansteuern (Mini-Testaufbau)'},
+    ]},
+  { id:'h1', title:'Phase 1 — Spezifikation', col:'#a855f7', duration:'3–5 Tage',
+    milestone:'5–6 harte Zahlen die jede spätere Entscheidung treiben',
+    tasks:[
+      {id:'h1-1', text:'Traglast am Greifer festlegen → 0,5 kg ✓', seed:true},
+      {id:'h1-2', text:'Reichweite festlegen → ~500 mm ✓', seed:true},
+      {id:'h1-3', text:'Achsenzahl bestätigen → 6 (volle Positions- und Orientierungsfreiheit) ✓', seed:true},
+      {id:'h1-4', text:'Ziel-Wiederholgenauigkeit → ±1 mm (realistisch für 3D-Druck-DIY) ✓', seed:true},
+      {id:'h1-5', text:'Arbeitsraum skizzieren (Halbkugel ~500 mm Radius um Basis)'},
+      {id:'h1-6', text:'Bauraum & Gewichtsbudget grob abstecken (Tisch? Gesamtgewicht?)'},
+    ]},
+  { id:'h2', title:'Phase 2 — Mechanische Auslegung', col:'#f97316', duration:'2–4 Wochen',
+    milestone:'Pro Achse begründet: Motor, Untersetzung, Getriebetyp',
+    tasks:[
+      {id:'h2-1', text:'Massen abschätzen: Greifer, jedes Armglied, jeder Motor'},
+      {id:'h2-2', text:'Für jedes Gelenk J6→J1 das statische Haltedrehmoment berechnen (Arm voll ausgestreckt)'},
+      {id:'h2-3', text:'Sicherheitsfaktor festlegen (Empfehlung: ~2× auf berechnetes Drehmoment)'},
+      {id:'h2-4', text:'Pro Achse Motor + Getriebeuntersetzung wählen: τ_Motor × Untersetzung ≥ τ_Gelenk × SF'},
+      {id:'h2-5', text:'Getriebetyp pro Achse entscheiden: Zahnriemen / Planetary / Cycloidal / Harmonic Drive'},
+      {id:'h2-6', text:'Optional: 3D-gedrucktes Cycloidal-Getriebe für eine Achse entwerfen'},
+      {id:'h2-7', text:'Stepper-Größen festlegen (NEMA 23/17 basisnah, NEMA 17/14 handnah)'},
+      {id:'h2-8', text:'Iterationsschleife: Motormassen in Drehmomentrechnung einsetzen und wiederholen'},
+    ]},
+  { id:'h3', title:'Phase 3 — CAD-Modellierung', col:'#f59e0b', duration:'4–8 Wochen',
+    milestone:'Vollständiges CAD-Modell · virtuell bewegbar · FEM bestanden · STLs druckbereit',
+    tasks:[
+      {id:'h3-1', text:'Fusion 360 installieren + Grundlagen-Tutorials (Skizzen, Extrusion, Bauteile, Baugruppen)'},
+      {id:'h3-2', text:'Jedes Armglied einzeln modellieren (Aufnahmen für Motoren, Lager, Getriebe)'},
+      {id:'h3-3', text:'Standardteile definieren die gekauft werden (Lager, Schrauben, Riemen) — Platz vorsehen'},
+      {id:'h3-4', text:'Gelenke in Fusion als bewegliche Joints definieren'},
+      {id:'h3-5', text:'Bewegungssimulation: kompletten Ablauf durchfahren, Kollisionen prüfen'},
+      {id:'h3-6', text:'Kabelführung mitdenken (wo laufen Leitungen durch die Gelenke?)'},
+      {id:'h3-7', text:'FEM-Belastungssimulation auf kritische Glieder (Durchbiegung unter Last?)'},
+      {id:'h3-8', text:'Designiteration nach Simulationsergebnissen'},
+    ]},
+  { id:'h4', title:'Phase 4 — Prototyping & Iteration', col:'#4ade80', duration:'4–10 Wochen (parallel zu Phase 5)',
+    milestone:'Arm steht physisch und lässt sich von Hand durch alle Gelenke bewegen',
+    tasks:[
+      {id:'h4-1', text:'Kaufteile bestellen (Motoren, Treiber, Lager, Schrauben, Riemen, Netzteil, Controller, Endschalter)'},
+      {id:'h4-2', text:'Erstes unkritisches Glied drucken, Passungen & Toleranzen prüfen'},
+      {id:'h4-3', text:'Druckeinstellungen kalibrieren (Toleranzen für Lagersitze etc.)'},
+      {id:'h4-4', text:'Alle Glieder drucken'},
+      {id:'h4-5', text:'Trockenmontage: zusammenstecken ohne Motoren, Passung & Beweglichkeit prüfen'},
+      {id:'h4-6', text:'Probleme zurück ins CAD und neu drucken (Iteration einplanen!)'},
+      {id:'h4-7', text:'Motoren und Getriebe einbauen'},
+      {id:'h4-8', text:'Mechanische Vollmontage'},
+    ]},
+  { id:'h5', title:'Phase 5 — Elektronik & Software', col:'#60a5fa', duration:'6–12 Wochen (parallel zu Phase 4)',
+    milestone:'Koordinate eingeben → Greifer fährt dorthin',
+    tasks:[
+      {id:'h5-1', text:'[Elektronik] Verkabelungsplan zeichnen (Motoren, Treiber, Controller, Netzteil, Endschalter)'},
+      {id:'h5-2', text:'[Elektronik] Netzteil dimensionieren (Summe Motorströme + Reserve)'},
+      {id:'h5-3', text:'[Elektronik] Stepper + Treiber + Controller verkabeln'},
+      {id:'h5-4', text:'[Elektronik] Endschalter für Homing jeder Achse montieren und verdrahten'},
+      {id:'h5-5', text:'[Software] Einzelne Motoren ansteuern (Schritte, Richtung, Geschwindigkeit)'},
+      {id:'h5-6', text:'[Software] Homing implementieren: jede Achse fährt auf Endschalter → kennt Nullposition'},
+      {id:'h5-7', text:'[Software] Gelenkwinkel-Steuerung: "fahre J2 auf 45°"'},
+      {id:'h5-8', text:'[Software] Vorwärtskinematik: aus Gelenkwinkeln Greiferposition berechnen'},
+      {id:'h5-9', text:'[Software] Inverse Kinematik: aus Zielposition Gelenkwinkel berechnen (der harte Teil)'},
+      {id:'h5-10',text:'[Optional] ROS 2 + MoveIt anbinden für Bewegungsplanung'},
+    ]},
+];
+
+let hildDone = {};
+const HILD_SEED_KEY = 'hild-seeded';
+
+function hildLoad(){
+  try{ hildDone = JSON.parse(localStorage.getItem('hild-done')||'{}'); }catch{}
+  // Seed Phase 1 tasks 1-4 as done on first load
+  if(!localStorage.getItem(HILD_SEED_KEY)){
+    ['h1-1','h1-2','h1-3','h1-4'].forEach(id=>{ hildDone[id]=true; });
+    localStorage.setItem('hild-done', JSON.stringify(hildDone));
+    localStorage.setItem(HILD_SEED_KEY,'1');
+  }
+}
+function hildSave(){ try{ localStorage.setItem('hild-done', JSON.stringify(hildDone)); }catch{} }
+
+let hildExpandedPhase = 'h0';
+
+function hildToggleTask(taskId){
+  hildDone[taskId] = !hildDone[taskId];
+  hildSave();
+  if(window.earnXP && hildDone[taskId]) window.earnXP(20,'str','Hildegard: Task erledigt');
+  hildRender();
+}
+function hildTogglePhase(id){
+  hildExpandedPhase = hildExpandedPhase===id ? null : id;
+  hildRender();
+}
+
+function hildRender(){
+  const allTasks = HILD_PHASES.flatMap(p=>p.tasks);
+  const totalDone = allTasks.filter(t=>hildDone[t.id]).length;
+  const pct = allTasks.length ? Math.round(totalDone/allTasks.length*100) : 0;
+
+  document.getElementById('hild-overall-label').textContent = totalDone+' / '+allTasks.length+' Aufgaben';
+  document.getElementById('hild-overall-bar').style.width = pct+'%';
+
+  // Phase chips
+  const chips = document.getElementById('hild-phase-chips');
+  chips.innerHTML = HILD_PHASES.map(p=>{
+    const pd = p.tasks.filter(t=>hildDone[t.id]).length;
+    const pp = Math.round(pd/p.tasks.length*100);
+    const done = pd===p.tasks.length;
+    return `<span onclick="hildTogglePhase('${p.id}')" style="font-size:9px;padding:3px 8px;border:1px solid ${p.col}${done?'':'44'};color:${done?'#000':p.col};background:${done?p.col:'transparent'};cursor:pointer;border-radius:2px;font-weight:600;transition:all 0.15s;">
+      ${done?'✓ ':''} ${p.id.replace('h','Ph.')} ${pp}%
+    </span>`;
+  }).join('');
+
+  // Phases
+  const cont = document.getElementById('hild-phases');
+  cont.innerHTML = HILD_PHASES.map(p=>{
+    const pd = p.tasks.filter(t=>hildDone[t.id]).length;
+    const pp = Math.round(pd/p.tasks.length*100);
+    const exp = hildExpandedPhase===p.id;
+    const done = pd===p.tasks.length;
+
+    let html = `<div style="margin-bottom:8px;">
+      <div onclick="hildTogglePhase('${p.id}')" style="display:flex;align-items:center;gap:10px;padding:11px 14px;background:var(--card);border:1px solid ${p.col}${done?'55':'22'};cursor:pointer;transition:border-color 0.15s;">
+        <div style="width:8px;height:8px;border-radius:50%;background:${done?p.col:'transparent'};border:2px solid ${p.col};flex-shrink:0;"></div>
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:13px;font-weight:700;color:${done?p.col:'var(--text)'};">${p.title}</div>
+          <div style="font-size:10px;color:var(--muted2);margin-top:1px;">${p.duration} · ${p.tasks.length} Aufgaben</div>
+        </div>
+        <div style="display:flex;gap:10px;align-items:center;flex-shrink:0;">
+          <div style="display:flex;align-items:center;gap:6px;">
+            <div style="height:3px;width:70px;background:var(--border);border-radius:2px;overflow:hidden;">
+              <div style="height:100%;background:${p.col};width:${pp}%;transition:width 0.4s;"></div>
+            </div>
+            <span style="font-size:10px;color:${p.col};font-weight:700;">${pd}/${p.tasks.length}</span>
+          </div>
+          <span style="font-size:10px;color:var(--muted2);">${exp?'▲':'▼'}</span>
+        </div>
+      </div>`;
+
+    if(exp){
+      html += `<div style="border-left:2px solid ${p.col}33;margin-left:14px;padding:10px 0 4px 14px;">
+        <div style="font-size:11px;color:var(--muted2);margin-bottom:8px;padding:7px 10px;background:rgba(0,0,0,0.2);border-left:2px solid ${p.col}88;">
+          🎯 <strong style="color:${p.col};">Meilenstein:</strong> ${p.milestone}
+        </div>`;
+      p.tasks.forEach(t=>{
+        const d = !!hildDone[t.id];
+        html += `<div onclick="hildToggleTask('${t.id}')" style="display:flex;align-items:flex-start;gap:9px;padding:8px 4px;border-bottom:1px solid var(--border);cursor:pointer;opacity:${d?0.45:1};transition:opacity 0.15s;" onmouseover="this.style.background='rgba(255,255,255,0.02)'" onmouseout="this.style.background=''">
+          <div style="width:15px;height:15px;border:1px solid ${d?p.col:'var(--border2)'};background:${d?p.col:'transparent'};border-radius:2px;display:grid;place-items:center;font-size:9px;color:#000;flex-shrink:0;margin-top:1px;transition:all 0.12s;">${d?'✓':''}</div>
+          <span style="font-size:12px;line-height:1.5;${d?'text-decoration:line-through;color:var(--muted);':''}">${t.text}</span>
+        </div>`;
+      });
+      html += `</div>`;
+    }
+    html += `</div>`;
+    return html;
+  }).join('');
+
+  // Notes
+  const notes = localStorage.getItem('hild-notes')||'';
+  const na = document.getElementById('hild-notes-area');
+  if(na && !na.querySelector('textarea')){
+    na.innerHTML = `<div onclick="hildEditNote()" style="font-size:12px;color:${notes?'var(--text)':'var(--muted2)'};cursor:text;min-height:50px;line-height:1.7;white-space:pre-wrap;">${notes||'Klicken zum Bearbeiten — Entscheidungen, Ideen, Probleme festhalten...'}</div>`;
+  }
+}
+
+function hildEditNote(){
+  const na = document.getElementById('hild-notes-area');
+  const notes = localStorage.getItem('hild-notes')||'';
+  na.innerHTML = `<textarea autofocus style="width:100%;min-height:100px;background:transparent;border:none;color:var(--text);font-family:var(--body);font-size:12px;resize:vertical;outline:none;line-height:1.7;">${notes}</textarea>`;
+  const ta = na.querySelector('textarea');
+  ta.focus();
+  ta.onblur = ()=>{ localStorage.setItem('hild-notes',ta.value); na.innerHTML=''; hildRender(); };
+}
+
+hildLoad();
+hildRender();
 </script>
 {% endblock %}
