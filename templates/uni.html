@@ -1,252 +1,710 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="page">
+<div class="page full-width">
   <div class="page-title">Uni</div>
   <div class="page-sub" id="uni-sub">SoSe 2026 · 2. Semester · 27 ECTS</div>
 
   <div class="tab-bar">
-    <button class="tab-btn active" onclick="showTab('lernplan',this)">Lernplan</button>
+    <button class="tab-btn active" onclick="showTab('overview',this)">Überblick</button>
+    <button class="tab-btn" onclick="showTab('deadlines',this)">Deadlines</button>
     <button class="tab-btn" onclick="showTab('module',this)">Module</button>
-    <button class="tab-btn" onclick="showTab('termine',this)">Termine</button>
+    <button class="tab-btn" onclick="showTab('lernplan',this)">Lernplan</button>
     <button class="tab-btn" onclick="showTab('methoden',this)">Methoden</button>
   </div>
 
+  <!-- ÜBERBLICK -->
+  <div class="tab-content active" id="tab-overview">
+    <div id="overview-content"></div>
+  </div>
+
+  <!-- DEADLINES (full CRUD) -->
+  <div class="tab-content" id="tab-deadlines">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+      <div class="filter-bar" style="margin:0;flex:1;">
+        <button class="filter-btn active" onclick="filterDeadlines('alle',this)">Alle</button>
+        <button class="filter-btn" onclick="filterDeadlines('woche',this)">Diese Woche</button>
+        <button class="filter-btn" onclick="filterDeadlines('pruefung',this)">Prüfungen</button>
+        <button class="filter-btn" onclick="filterDeadlines('ha',this)">Hausaufgaben</button>
+        <button class="filter-btn" onclick="filterDeadlines('done',this)">Erledigt</button>
+      </div>
+      <button class="btn-primary" style="flex-shrink:0;padding:7px 14px;font-size:10px;" onclick="openDeadlineForm()">+ Hinzufügen</button>
+    </div>
+    <div id="deadlines-list"></div>
+  </div>
+
+  <!-- MODULE (grade book) -->
+  <div class="tab-content" id="tab-module">
+    <div id="modules-content"></div>
+  </div>
+
   <!-- LERNPLAN -->
-  <div class="tab-content active" id="tab-lernplan">
+  <div class="tab-content" id="tab-lernplan">
     <div style="display:flex;gap:4px;margin-bottom:20px;overflow-x:auto;padding-bottom:4px;" id="phase-timeline"></div>
     <div id="phase-detail"></div>
     <div class="sec-label">Alle Phasen</div>
     <div id="all-phases"></div>
   </div>
 
-  <!-- MODULE -->
-  <div class="tab-content" id="tab-module">
-    <div id="modules-list"></div>
-  </div>
-
-  <!-- TERMINE -->
-  <div class="tab-content" id="tab-termine">
-    <div style="margin-bottom:20px;">
-      <div style="font-family:var(--display);font-size:20px;font-style:italic;font-weight:700;margin-bottom:4px;">Timeline</div>
-      <div style="font-size:10px;color:var(--muted2);" id="termine-progress">0/0 erledigt</div>
-    </div>
-    <div class="card" style="padding:0;overflow:hidden;" id="termine-list"></div>
-  </div>
-
   <!-- METHODEN -->
   <div class="tab-content" id="tab-methoden">
-    <div style="font-family:var(--display);font-size:20px;font-style:italic;font-weight:700;margin-bottom:4px;">Science-Based Learning</div>
-    <div style="font-size:10px;color:var(--muted2);margin-bottom:20px;">Basierend auf Kognitionswissenschaft &amp; Lernforschung</div>
-    <div class="card" style="margin-bottom:8px;">
-      <div style="font-size:9px;color:var(--muted2);font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px;">◈ Active Recall</div>
-      <div style="font-size:11px;color:var(--text);line-height:1.5;margin-bottom:4px;">Aktives Abrufen schlägt Wiederlesen — Prüfe dich selbst. Studierende, die sich selbst testen, vergessen nur 13% nach 2 Tagen (vs. 56% beim Wiederlesen).</div>
-      <div style="font-size:9px;color:var(--muted2);font-style:italic;">Quelle: Karpicke, Purdue 2012</div>
+    <div style="font-family:var(--display);font-size:18px;font-weight:900;margin-bottom:4px;letter-spacing:1px;">Science-Based Learning</div>
+    <div style="font-size:9px;color:var(--muted2);margin-bottom:18px;letter-spacing:1px;">Basierend auf Kognitionswissenschaft & Lernforschung</div>
+    <div class="card" style="margin-bottom:8px;border-left:2px solid var(--neon);">
+      <div class="sec-div" style="margin-top:0;">◈ Active Recall</div>
+      <div style="font-size:11px;line-height:1.6;margin-bottom:4px;">Aktives Abrufen schlägt Wiederlesen. Studierende, die sich selbst testen, vergessen nur 13% nach 2 Tagen vs. 56% beim Wiederlesen.</div>
+      <div style="font-size:9px;color:var(--muted2);font-style:italic;">Karpicke, Purdue 2012</div>
     </div>
-    <div class="card" style="margin-bottom:8px;">
-      <div style="font-size:9px;color:var(--muted2);font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px;">◉ Spaced Repetition</div>
-      <div style="font-size:11px;color:var(--text);line-height:1.5;margin-bottom:4px;">Verteile Lerneinheiten über Zeit — 1, 3, 7, 14 Tage. Anki oder manuelles Wiederholen verdoppelt die Retention im Vergleich zu Massed Practice.</div>
-      <div style="font-size:9px;color:var(--muted2);font-style:italic;">Quelle: Meta-Analyse, Springer 2025</div>
+    <div class="card" style="margin-bottom:8px;border-left:2px solid var(--purple);">
+      <div class="sec-div" style="margin-top:0;">◉ Spaced Repetition</div>
+      <div style="font-size:11px;line-height:1.6;margin-bottom:4px;">Verteile Lerneinheiten über Zeit — 1, 3, 7, 14 Tage. Anki oder manuelles Wiederholen verdoppelt die Retention.</div>
+      <div style="font-size:9px;color:var(--muted2);font-style:italic;">Meta-Analyse, Springer 2025</div>
     </div>
-    <div class="card" style="margin-bottom:8px;">
-      <div style="font-size:9px;color:var(--muted2);font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px;">▣ Interleaving</div>
-      <div style="font-size:11px;color:var(--text);line-height:1.5;margin-bottom:4px;">Wechsle zwischen Fächern und Aufgabentypen. Gemischtes Üben führte in Studien zu 63% vs. 54% Retention nach einem Monat.</div>
-      <div style="font-size:9px;color:var(--muted2);font-style:italic;">Quelle: PMC 2024, Interleaving STEM</div>
+    <div class="card" style="margin-bottom:8px;border-left:2px solid var(--cyan);">
+      <div class="sec-div" style="margin-top:0;">▣ Interleaving</div>
+      <div style="font-size:11px;line-height:1.6;margin-bottom:4px;">Wechsle zwischen Fächern und Aufgabentypen. Gemischtes Üben: 63% vs. 54% Retention nach einem Monat.</div>
+      <div style="font-size:9px;color:var(--muted2);font-style:italic;">PMC 2024, Interleaving STEM</div>
     </div>
-    <div class="card" style="margin-bottom:8px;">
-      <div style="font-size:9px;color:var(--muted2);font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px;">◐ Pomodoro 25/5</div>
-      <div style="font-size:11px;color:var(--text);line-height:1.5;margin-bottom:4px;">Kognitive Leistung sinkt nach ~25–30 min. 25 min Vollgas + 5 min Pause ist die optimal getestete Einheit. Handy weg, Tür zu.</div>
-      <div style="font-size:9px;color:var(--muted2);font-style:italic;">Quelle: PMC 2025, Attention Research</div>
+    <div class="card" style="margin-bottom:8px;border-left:2px solid var(--orange);">
+      <div class="sec-div" style="margin-top:0;">◐ Pomodoro 25/5</div>
+      <div style="font-size:11px;line-height:1.6;margin-bottom:4px;">Kognitive Leistung sinkt nach ~25–30 min. 25 min Vollgas + 5 min Pause ist die optimal getestete Einheit.</div>
+      <div style="font-size:9px;color:var(--muted2);font-style:italic;">PMC 2025, Attention Research</div>
     </div>
-    <div class="card" style="margin-bottom:8px;">
-      <div style="font-size:9px;color:var(--muted2);font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px;">✦ Schlaf</div>
-      <div style="font-size:11px;color:var(--text);line-height:1.5;margin-bottom:4px;">Schlaf konsolidiert Gedächtnis. 7–8h sind keine Verschwendung — Crammen nach Mitternacht kostet mehr als es bringt.</div>
-      <div style="font-size:9px;color:var(--muted2);font-style:italic;">Quelle: Walker 2017, Why We Sleep</div>
+    <div class="card" style="margin-bottom:8px;border-left:2px solid var(--blue);">
+      <div class="sec-div" style="margin-top:0;">✦ Schlaf & Konsolidierung</div>
+      <div style="font-size:11px;line-height:1.6;margin-bottom:4px;">Schlaf konsolidiert Gedächtnis. Crammen nach Mitternacht kostet mehr als es bringt. 7–8h minimum.</div>
+      <div style="font-size:9px;color:var(--muted2);font-style:italic;">Walker 2017, Why We Sleep</div>
     </div>
-    <div class="card" style="margin-top:16px;border-color:var(--border2);">
-      <div style="font-family:var(--sans);font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;color:var(--accent);">Optimale Studien-Session</div>
-      <div style="display:flex;gap:12px;margin-bottom:6px;font-size:10px;"><span style="color:var(--accent2);width:60px;flex-shrink:0;">0–5 min</span><span>Setup: Handy weg, Ziel definieren</span></div>
-      <div style="display:flex;gap:12px;margin-bottom:6px;font-size:10px;"><span style="color:var(--accent2);width:60px;flex-shrink:0;">5–30 min</span><span>Deep Work 1: Aufgaben lösen (kein Wiederlesen!)</span></div>
-      <div style="display:flex;gap:12px;margin-bottom:6px;font-size:10px;"><span style="color:var(--accent2);width:60px;flex-shrink:0;">30–35 min</span><span>Pause: Wasser, kurz bewegen</span></div>
-      <div style="display:flex;gap:12px;margin-bottom:6px;font-size:10px;"><span style="color:var(--accent2);width:60px;flex-shrink:0;">35–60 min</span><span>Deep Work 2: anderes Teilgebiet (Interleaving!)</span></div>
-      <div style="display:flex;gap:12px;margin-bottom:6px;font-size:10px;"><span style="color:var(--accent2);width:60px;flex-shrink:0;">65–90 min</span><span>Active Recall: alles aus Kopf aufschreiben</span></div>
-      <div style="display:flex;gap:12px;font-size:10px;"><span style="color:var(--accent2);width:60px;flex-shrink:0;">90 min</span><span>Lernziel prüfen, nächste Session planen</span></div>
+    <div class="card" style="border-color:var(--border2);margin-top:16px;">
+      <div class="sec-div" style="color:var(--neon);border-color:var(--neon);margin-top:0;">Optimale 90-min-Session</div>
+      <div style="display:flex;gap:12px;margin-bottom:7px;font-size:10px;"><span style="color:var(--neon);width:58px;flex-shrink:0;">0–5 min</span><span>Setup: Handy weg, Ziel definieren</span></div>
+      <div style="display:flex;gap:12px;margin-bottom:7px;font-size:10px;"><span style="color:var(--neon);width:58px;flex-shrink:0;">5–30 min</span><span>Deep Work 1: Aufgaben lösen (kein Lesen!)</span></div>
+      <div style="display:flex;gap:12px;margin-bottom:7px;font-size:10px;"><span style="color:var(--neon);width:58px;flex-shrink:0;">30–35 min</span><span>Pause: Wasser, kurz bewegen</span></div>
+      <div style="display:flex;gap:12px;margin-bottom:7px;font-size:10px;"><span style="color:var(--neon);width:58px;flex-shrink:0;">35–65 min</span><span>Deep Work 2: anderes Teilgebiet (Interleaving!)</span></div>
+      <div style="display:flex;gap:12px;margin-bottom:7px;font-size:10px;"><span style="color:var(--neon);width:58px;flex-shrink:0;">65–85 min</span><span>Active Recall: alles aus Kopf aufschreiben</span></div>
+      <div style="display:flex;gap:12px;font-size:10px;"><span style="color:var(--neon);width:58px;flex-shrink:0;">85–90 min</span><span>Lernziel prüfen, nächste Session planen</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- Deadline Form Sheet -->
+<div class="sheet-backdrop" id="dl-sheet" style="display:none;" onclick="if(event.target===this)closeDeadlineForm()">
+  <div class="sheet" id="dl-sheet-inner">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title" id="dl-sheet-title">Deadline hinzufügen</div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Fach</label>
+        <select class="form-select" id="dl-subject">
+          <option value="">Fach wählen...</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Typ</label>
+        <select class="form-select" id="dl-type">
+          <option value="pruefung">Prüfung</option>
+          <option value="ha">Hausaufgabe</option>
+          <option value="abgabe">Abgabe</option>
+          <option value="projekt">Projekt</option>
+          <option value="klausur">Klausur</option>
+          <option value="sonstiges">Sonstiges</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Titel / Bezeichnung</label>
+      <input class="form-input" id="dl-label" placeholder="z.B. Hausaufgabe 4, KFT..." autocomplete="off">
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Datum</label>
+        <input class="form-input" id="dl-date" type="date">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Uhrzeit (optional)</label>
+        <input class="form-input" id="dl-time" type="time">
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Priorität</label>
+      <div style="display:flex;gap:8px;">
+        <label style="display:flex;align-items:center;gap:5px;cursor:pointer;font-size:10px;">
+          <input type="radio" name="dl-prio" value="hoch" style="accent-color:var(--red)"> <span style="color:var(--red);">Hoch</span>
+        </label>
+        <label style="display:flex;align-items:center;gap:5px;cursor:pointer;font-size:10px;">
+          <input type="radio" name="dl-prio" value="mittel" checked style="accent-color:var(--orange)"> <span style="color:var(--orange);">Mittel</span>
+        </label>
+        <label style="display:flex;align-items:center;gap:5px;cursor:pointer;font-size:10px;">
+          <input type="radio" name="dl-prio" value="niedrig" style="accent-color:var(--muted2)"> <span style="color:var(--muted2);">Niedrig</span>
+        </label>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Notizen</label>
+      <textarea class="form-textarea" id="dl-notes" placeholder="Hinweise, Themen, Links..."></textarea>
+    </div>
+
+    <div class="form-actions">
+      <button class="btn-primary" id="dl-save-btn" onclick="saveDeadline()">Speichern</button>
+      <button class="btn-secondary" onclick="closeDeadlineForm()">Abbrechen</button>
+    </div>
+  </div>
+</div>
+
+<!-- Grade Form Sheet -->
+<div class="sheet-backdrop centered" id="grade-sheet" style="display:none;" onclick="if(event.target===this)closeGradeForm()">
+  <div class="sheet pink">
+    <div class="sheet-title">Note hinzufügen</div>
+    <div style="font-size:9px;color:var(--muted2);margin-top:-6px;" id="grade-sheet-sub"></div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Note (1.0 – 5.0)</label>
+        <input class="form-input" id="g-grade" type="number" min="1" max="5" step="0.1" placeholder="1.7">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Gewichtung</label>
+        <select class="form-select" id="g-weight">
+          <option value="1">Normal (1×)</option>
+          <option value="2">Doppelt (2×)</option>
+          <option value="0.5">Halb (0.5×)</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Bezeichnung</label>
+      <input class="form-input" id="g-label" placeholder="z.B. HA3, Zwischentest...">
+    </div>
+    <div class="form-actions">
+      <button class="btn-primary pink" onclick="saveGrade()">Note speichern</button>
+      <button class="btn-secondary" onclick="closeGradeForm()">Abbrechen</button>
     </div>
   </div>
 </div>
 
 <script>
 function showTab(id,btn){
-  document.querySelectorAll('.tab-content').forEach(el=>{el.classList.remove('active');});
-  document.querySelectorAll('.tab-btn').forEach(b=>{b.classList.remove('active');});
+  document.querySelectorAll('.tab-content').forEach(el=>el.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('tab-'+id).classList.add('active');
   if(btn) btn.classList.add('active');
+  if(id==='overview') renderOverview();
+  if(id==='deadlines') renderDeadlines();
+  if(id==='module') renderModules();
 }
 
-const EXAMS = [
-  {id:"mech2-kft", sub:"Mechanik 2",label:"KFT",          date:"2026-06-05",time:"13:00",col:"#f97316",type:"Vortest"},
-  {id:"kl1-ha3",   sub:"KL1",       label:"HA3",          date:"2026-06-07",time:"22:45",col:"#60a5fa",type:"Hausaufgabe"},
-  {id:"dgl-zwt",   sub:"DGL",       label:"Zwischentest", date:"2026-06-12",time:"22:00",col:"#a78bfa",type:"Zwischentest"},
-  {id:"kl1-ha4",   sub:"KL1",       label:"HA4",          date:"2026-06-21",time:"22:45",col:"#60a5fa",type:"Hausaufgabe"},
-  {id:"dts1",      sub:"ITP",       label:"Abgabe dts",   date:"2026-07-03",time:"16:00",col:"#22d3ee",type:"Abgabe"},
-  {id:"kl1-ha5",   sub:"KL1",       label:"HA5",          date:"2026-07-05",time:"22:45",col:"#60a5fa",type:"Hausaufgabe"},
-  {id:"itp-test",  sub:"ITP",       label:"Test",         date:"2026-07-14",time:"16:00",col:"#22d3ee",type:"Prüfung"},
-  {id:"dts2",      sub:"ITP",       label:"Abgabe dts",   date:"2026-07-17",time:"16:00",col:"#22d3ee",type:"Abgabe"},
-  {id:"dgl-final", sub:"DGL",       label:"Prüfung",      date:"2026-07-21",time:"13:30",col:"#a78bfa",type:"Prüfung"},
-  {id:"ana2-final",sub:"Ana2",      label:"Prüfung",      date:"2026-07-23",time:"15:00",col:"#4ade80",type:"Prüfung"},
-  {id:"kl1-test",  sub:"KL1",       label:"Test",         date:"2026-08-03",time:"12:00",col:"#60a5fa",type:"Prüfung"},
-  {id:"kl1-ha6",   sub:"KL1",       label:"HA6",          date:"2026-08-09",time:"22:45",col:"#60a5fa",type:"Hausaufgabe"},
+/* ── Data ──────────────────────────────────────────────────────────────── */
+const SUBJECTS = ['Mechanik 2','KL1','DGL','Ana2','ITP','BEARS','Spanisch','Russisch','Mathe','Sonstiges'];
+const SUB_COL  = {'Mechanik 2':'#f97316','KL1':'#60a5fa','DGL':'#a78bfa','Ana2':'#4ade80','ITP':'#22d3ee','BEARS':'#f59e0b','Spanisch':'#f97316','Russisch':'#60a5fa','Mathe':'#e879f9','Sonstiges':'#8888aa'};
+const TYPE_LABEL = {pruefung:'Prüfung',ha:'Hausaufgabe',abgabe:'Abgabe',projekt:'Projekt',klausur:'Klausur',sonstiges:'Sonstiges'};
+const PRIO_COL   = {hoch:'#ef4444',mittel:'#f97316',niedrig:'#52526a'};
+
+const SEED_DEADLINES = [
+  {id:'s1', subject:'Mechanik 2',label:'KFT',          date:'2026-06-05',time:'13:00',type:'pruefung', priority:'hoch',  done:false,notes:''},
+  {id:'s2', subject:'KL1',       label:'HA3',           date:'2026-06-07',time:'22:45',type:'ha',       priority:'hoch',  done:false,notes:''},
+  {id:'s3', subject:'DGL',       label:'Zwischentest',  date:'2026-06-12',time:'22:00',type:'pruefung', priority:'hoch',  done:false,notes:''},
+  {id:'s4', subject:'KL1',       label:'HA4',           date:'2026-06-21',time:'22:45',type:'ha',       priority:'mittel',done:false,notes:''},
+  {id:'s5', subject:'ITP',       label:'Abgabe dts',    date:'2026-07-03',time:'16:00',type:'abgabe',   priority:'mittel',done:false,notes:''},
+  {id:'s6', subject:'KL1',       label:'HA5',           date:'2026-07-05',time:'22:45',type:'ha',       priority:'mittel',done:false,notes:''},
+  {id:'s7', subject:'ITP',       label:'Test',          date:'2026-07-14',time:'16:00',type:'pruefung', priority:'hoch',  done:false,notes:''},
+  {id:'s8', subject:'DGL',       label:'Prüfung',       date:'2026-07-21',time:'13:30',type:'klausur',  priority:'hoch',  done:false,notes:''},
+  {id:'s9', subject:'Ana2',      label:'Prüfung',       date:'2026-07-23',time:'15:00',type:'klausur',  priority:'hoch',  done:false,notes:''},
+  {id:'s10',subject:'KL1',       label:'Test',          date:'2026-08-03',time:'12:00',type:'klausur',  priority:'hoch',  done:false,notes:''},
+  {id:'s11',subject:'KL1',       label:'HA6',           date:'2026-08-09',time:'22:45',type:'ha',       priority:'mittel',done:false,notes:''},
 ];
-const MODULES = [
-  {code:"MECH2",name:"Mechanik 2",      ects:6,col:"#f97316",difficulty:4,examDate:"2026-06-05",examLabel:"KFT 5. Jun",
-   topics:["Kinematik starrer Körper","Kinetik","Schwingungen","Dreidimensionale Mechanik"],
-   strategy:"Alte Klausuren durchrechnen — KFT kommt bald!"},
-  {code:"KL1",  name:"Klassische Mechanik 1",ects:6,col:"#60a5fa",difficulty:5,examDate:"2026-08-03",examLabel:"Test 3. Aug",
-   topics:["Lagrange-Formalismus","Erhaltungsgrößen","Hamiltonsche Mechanik","Zentralkraftprobleme","Starrer Körper"],
-   strategy:"HAs wöchentlich + regelmäßige Aufgaben mit Spaced Repetition"},
-  {code:"DGL",  name:"DGL für Ing",     ects:5,col:"#a78bfa",difficulty:3,examDate:"2026-07-21",examLabel:"Prüfung 21. Jul",
-   topics:["Lineare DGLs 1. & 2. Ordnung","Systeme von DGLs","Laplace-Transformation","Numerik"],
-   strategy:"Formelsammlung aufbauen + Zwischentest als Meilenstein"},
-  {code:"ANA2", name:"Analysis 2",      ects:6,col:"#4ade80",difficulty:4,examDate:"2026-07-23",examLabel:"Prüfung 23. Jul",
-   topics:["Mehrdimensionale Integration","Kurven- & Flächenintegrale","Vektoranalysis","Fourierreihen"],
-   strategy:"Interleaving mit DGL — viele gemeinsame Methoden"},
-  {code:"ITP",  name:"ITP",             ects:4,col:"#22d3ee",difficulty:3,examDate:"2026-07-14",examLabel:"Test 14. Jul",
-   topics:["Datenstrukturen","Algorithmen","Programmierparadigmen","dts-Abgaben"],
-   strategy:"dts-Projekte kontinuierlich bearbeiten"},
+
+const MODULES_DEF = [
+  {code:'MECH2',name:'Mechanik 2',      ects:6,col:'#f97316',diff:4,
+   topics:['Kinematik starrer Körper','Kinetik','Schwingungen','3D-Mechanik'],
+   strat:'Alte Klausuren durchrechnen — KFT kommt bald!'},
+  {code:'KL1',  name:'Klassische Mechanik 1',ects:6,col:'#60a5fa',diff:5,
+   topics:['Lagrange-Formalismus','Erhaltungsgrößen','Hamiltonsche Mechanik','Zentralkraftprobleme'],
+   strat:'HAs wöchentlich + regelmäßige Aufgaben mit Spaced Repetition'},
+  {code:'DGL',  name:'DGL für Ing',     ects:5,col:'#a78bfa',diff:3,
+   topics:['Lineare DGLs 1./2. Ordnung','Systeme','Laplace-Transformation','Numerik'],
+   strat:'Formelsammlung aufbauen + Zwischentest als Meilenstein'},
+  {code:'ANA2', name:'Analysis 2',      ects:6,col:'#4ade80',diff:4,
+   topics:['Mehrdim. Integration','Kurven- & Flächenintegrale','Vektoranalysis','Fourier'],
+   strat:'Interleaving mit DGL — viele gemeinsame Methoden'},
+  {code:'ITP',  name:'ITP',             ects:4,col:'#22d3ee',diff:3,
+   topics:['Datenstrukturen','Algorithmen','Programmierparadigmen','dts-Abgaben'],
+   strat:'dts-Projekte kontinuierlich bearbeiten'},
 ];
+
 const PHASES = [
-  {id:"p1",label:"Phase 1",title:"Sofort-Modus",     from:"2026-05-27",to:"2026-06-05",focus:"Mechanik 2",badge:"9 Tage",badgeCol:"#ef4444",
-   desc:"KFT Mechanik2 am 5. Jun — voller Fokus. KL1 HA3 nebenbei fertigstellen.",
-   daily:[{sub:"Mechanik 2",h:3,col:"#f97316"},{sub:"KL1 HA3",h:1,col:"#60a5fa"},{sub:"DGL",h:0.5,col:"#a78bfa"}],
-   tactics:["Alle alten Klausuren Mechanik2 durchrechnen (Active Recall)","Fehler sofort nachschlagen","Formelblatt handschriftlich erstellen"]},
-  {id:"p2",label:"Phase 2",title:"DGL Zwischentest", from:"2026-06-06",to:"2026-06-12",focus:"DGL",badge:"7 Tage",badgeCol:"#f59e0b",
-   desc:"DGL Zwischentest am 12. Jun. Mech2 KFT ist durch — jetzt DGL Vollgas.",
-   daily:[{sub:"DGL",h:3,col:"#a78bfa"},{sub:"KL1",h:1,col:"#60a5fa"},{sub:"Ana2",h:0.5,col:"#4ade80"}],
-   tactics:["DGL Formelsammlung aufbauen (Anki-Karten)","Aufgaben von alten Zwischentests lösen","Interleave: DGL und Ana2 haben gemeinsame Methoden"]},
-  {id:"p3",label:"Phase 3",title:"Breite Basis",     from:"2026-06-13",to:"2026-07-13",focus:"Alle Fächer",badge:"30 Tage",badgeCol:"#4ade80",
-   desc:"Gleichmäßig alle Fächer voranbringen. ITP dts-Abgaben nicht verschleppen!",
-   daily:[{sub:"KL1",h:1.5,col:"#60a5fa"},{sub:"Ana2",h:1.5,col:"#4ade80"},{sub:"DGL",h:1,col:"#a78bfa"},{sub:"ITP",h:1,col:"#22d3ee"}],
-   tactics:["Interleaving: Täglich Fächer mischen","Wöchentliche Wiederholung aller Themen","ITP dts mind. 1h/Woche","KL1 HAs pünktlich abgeben"]},
-  {id:"p4",label:"Phase 4",title:"Prüfungsmarathon", from:"2026-07-14",to:"2026-07-23",focus:"ITP → DGL → Ana2",badge:"10 Tage",badgeCol:"#f97316",
-   desc:"ITP Test 14. Jul, DGL 21. Jul, Ana2 23. Jul. Drei in zehn Tagen.",
-   daily:[{sub:"Tagesfokus",h:4,col:"#ffffff"},{sub:"Wiederholung andere",h:1,col:"#52526a"}],
-   tactics:["14. Jul: ITP — 3 Tage vorher nur ITP","15–20. Jul: DGL — vollständige Formelsammlung","21. Jul abends: Ana2 Light-Review","Schlaf priorisieren: 7–8h"]},
-  {id:"p5",label:"Phase 5",title:"KL1 Endspurt",    from:"2026-07-24",to:"2026-08-03",focus:"KL1",badge:"11 Tage",badgeCol:"#60a5fa",
-   desc:"KL1 Test am 3. Aug. Voller Fokus auf Lagrange & Hamiltonismus.",
-   daily:[{sub:"KL1",h:4,col:"#60a5fa"},{sub:"Wiederholung",h:0.5,col:"#52526a"}],
-   tactics:["Alle Übungsblätter nochmals durchrechnen ohne Lösung","Lagrange & Hamiltonsche Mechanik auswendig","Mock-Prüfung 2 Tage vor Test"]},
+  {id:'p1',label:'Phase 1',title:'Sofort-Modus',     from:'2026-05-27',to:'2026-06-05',focus:'Mechanik 2',badge:'9 Tage',badgeCol:'#ef4444',
+   desc:'KFT Mechanik2 am 5. Jun — voller Fokus. KL1 HA3 nebenbei fertigstellen.',
+   daily:[{sub:'Mechanik 2',h:3,col:'#f97316'},{sub:'KL1 HA3',h:1,col:'#60a5fa'},{sub:'DGL',h:0.5,col:'#a78bfa'}],
+   tactics:['Alle alten Klausuren Mechanik2 durchrechnen (Active Recall)','Fehler sofort nachschlagen','Formelblatt handschriftlich erstellen']},
+  {id:'p2',label:'Phase 2',title:'DGL Zwischentest', from:'2026-06-06',to:'2026-06-12',focus:'DGL',badge:'7 Tage',badgeCol:'#f59e0b',
+   desc:'DGL Zwischentest am 12. Jun. Mech2 KFT ist durch — jetzt DGL Vollgas.',
+   daily:[{sub:'DGL',h:3,col:'#a78bfa'},{sub:'KL1',h:1,col:'#60a5fa'},{sub:'Ana2',h:0.5,col:'#4ade80'}],
+   tactics:['DGL Formelsammlung aufbauen','Aufgaben von alten Zwischentests lösen','Interleave: DGL und Ana2 gemeinsame Methoden']},
+  {id:'p3',label:'Phase 3',title:'Breite Basis',     from:'2026-06-13',to:'2026-07-13',focus:'Alle Fächer',badge:'30 Tage',badgeCol:'#4ade80',
+   desc:'Gleichmäßig alle Fächer voranbringen. ITP dts-Abgaben nicht verschleppen!',
+   daily:[{sub:'KL1',h:1.5,col:'#60a5fa'},{sub:'Ana2',h:1.5,col:'#4ade80'},{sub:'DGL',h:1,col:'#a78bfa'},{sub:'ITP',h:1,col:'#22d3ee'}],
+   tactics:['Interleaving: Täglich Fächer mischen','Wöchentliche Wiederholung aller Themen','ITP dts mind. 1h/Woche']},
+  {id:'p4',label:'Phase 4',title:'Prüfungsmarathon', from:'2026-07-14',to:'2026-07-23',focus:'ITP → DGL → Ana2',badge:'10 Tage',badgeCol:'#f97316',
+   desc:'ITP Test 14. Jul, DGL 21. Jul, Ana2 23. Jul. Drei in zehn Tagen.',
+   daily:[{sub:'Tagesfokus',h:4,col:'#ffffff'},{sub:'Wiederholung andere',h:1,col:'#52526a'}],
+   tactics:['14. Jul: ITP — 3 Tage vorher nur ITP','15–20. Jul: DGL vollständige Formelsammlung','Schlaf priorisieren: 7–8h']},
+  {id:'p5',label:'Phase 5',title:'KL1 Endspurt',    from:'2026-07-24',to:'2026-08-03',focus:'KL1',badge:'11 Tage',badgeCol:'#60a5fa',
+   desc:'KL1 Test am 3. Aug. Voller Fokus auf Lagrange & Hamiltonismus.',
+   daily:[{sub:'KL1',h:4,col:'#60a5fa'},{sub:'Wiederholung',h:0.5,col:'#52526a'}],
+   tactics:['Alle Übungsblätter nochmals durchrechnen ohne Lösung','Mock-Prüfung 2 Tage vor Test']},
 ];
 
-function daysUntil(s){return Math.ceil((new Date(s)-new Date())/86400000);}
-function fmtDate(s){const d=new Date(s);return String(d.getDate()).padStart(2,'0')+'.'+String(d.getMonth()+1).padStart(2,'0')+'.';}
+/* ── Storage ────────────────────────────────────────────────────────── */
+function loadDL(){ try{ const d=JSON.parse(localStorage.getItem('uni-dl-v3')||'null'); return d||SEED_DEADLINES; }catch{ return SEED_DEADLINES; } }
+function saveDL(arr){ try{ localStorage.setItem('uni-dl-v3',JSON.stringify(arr)); }catch{} }
+function loadGrades(){ try{ return JSON.parse(localStorage.getItem('uni-grades-v3')||'{}'); }catch{ return {}; } }
+function saveGrades(g){ try{ localStorage.setItem('uni-grades-v3',JSON.stringify(g)); }catch{} }
+function loadSubjectNotes(){ try{ return JSON.parse(localStorage.getItem('uni-sub-notes')||'{}'); }catch{ return {}; } }
+function saveSubjectNotes(n){ try{ localStorage.setItem('uni-sub-notes',JSON.stringify(n)); }catch{} }
 
-(function initUni(){
-  const today = new Date();
-  const upcoming = EXAMS.filter(e=>daysUntil(e.date)>=0).sort((a,b)=>new Date(a.date)-new Date(b.date));
-  if(upcoming[0]){
-    const d=daysUntil(upcoming[0].date);
-    document.getElementById('uni-sub').textContent='SoSe 2026 · 2. Semester · 27 ECTS — Nächstes: '+upcoming[0].sub+' '+upcoming[0].label+' in '+d+'d';
+// init seed
+if(!localStorage.getItem('uni-dl-v3')) saveDL(SEED_DEADLINES);
+
+/* ── Helpers ────────────────────────────────────────────────────────── */
+function daysUntil(s){ return Math.ceil((new Date(s)-new Date())/86400000); }
+function fmtDate(s){ const d=new Date(s); return String(d.getDate()).padStart(2,'0')+'.'+String(d.getMonth()+1).padStart(2,'0')+'.'; }
+function daysLabel(d){
+  if(d<0) return {txt:'vorbei', col:'var(--muted)'};
+  if(d===0) return {txt:'HEUTE!', col:'var(--red)'};
+  if(d===1) return {txt:'morgen', col:'#f59e0b'};
+  if(d<=7)  return {txt:'in '+d+'d', col:'#f97316'};
+  return {txt:'in '+d+'d', col:'var(--muted2)'};
+}
+function uid(){ return 'dl'+Date.now()+Math.random().toString(36).slice(2,6); }
+function calcAvg(entries){
+  if(!entries||!entries.length) return null;
+  const totalW=entries.reduce((s,e)=>s+(e.weight||1),0);
+  const val=entries.reduce((s,e)=>s+(parseFloat(e.grade)*(e.weight||1)),0)/totalW;
+  return Math.round(val*10)/10;
+}
+function gradeColor(g){ if(!g) return 'var(--muted2)'; if(g<=1.5) return '#4ade80'; if(g<=2.5) return '#22d3ee'; if(g<=3.5) return '#f97316'; return '#ef4444'; }
+
+/* ── Overview ───────────────────────────────────────────────────────── */
+function renderOverview(){
+  const dl = loadDL().sort((a,b)=>new Date(a.date)-new Date(b.date));
+  const now = new Date();
+  const weekEnd = new Date(now.getTime()+7*86400000);
+  const upcoming   = dl.filter(d=>!d.done && daysUntil(d.date)>=0).slice(0,6);
+  const thisWeek   = dl.filter(d=>!d.done && daysUntil(d.date)>=0 && new Date(d.date)<=weekEnd);
+  const open       = dl.filter(d=>!d.done && daysUntil(d.date)>=0);
+  const done       = dl.filter(d=>d.done);
+  const grades     = loadGrades();
+
+  // Recommendation: subject with most urgent deadline
+  const nextDl = open[0];
+  const nextSub = nextDl ? nextDl.subject : 'KL1';
+  const nextDays = nextDl ? daysUntil(nextDl.date) : null;
+
+  // Study time from study log
+  const studyLog = JSON.parse(localStorage.getItem('study-log')||'[]');
+  const todaySessions = studyLog.filter(e=>{
+    try{ return new Date(e.time||'').toDateString()===now.toDateString(); }catch{ return false; }
+  });
+
+  // All subject averages
+  const avgList = Object.entries(grades).map(([sub,g])=>{
+    const avg=calcAvg(g.entries||[]); return {sub,avg};
+  }).filter(x=>x.avg!==null);
+
+  let html = '';
+
+  // Stats
+  html += `<div class="stats-row">
+    <div class="stat-box"><div class="stat-box-num" style="color:var(--red);">${thisWeek.length}</div><div class="stat-box-label">Diese Woche</div></div>
+    <div class="stat-box"><div class="stat-box-num" style="color:var(--neon);">${open.length}</div><div class="stat-box-label">Offen</div></div>
+    <div class="stat-box"><div class="stat-box-num" style="color:var(--muted2);">${done.length}</div><div class="stat-box-label">Erledigt</div></div>
+    <div class="stat-box"><div class="stat-box-num" style="color:var(--pink);">${pomSessions||0}</div><div class="stat-box-label">Sessions heute</div></div>
+  </div>`;
+
+  // Recommendation
+  if(nextDl){
+    const dl2 = daysLabel(nextDays);
+    html += `<div class="reco-card">
+      <div class="reco-icon">🎯</div>
+      <div class="reco-body">
+        <div class="reco-label">Empfehlung für heute</div>
+        <div class="reco-title">${nextSub} — ${nextDl.label}</div>
+        <div class="reco-sub" style="color:${dl2.col};">${dl2.txt} · ${nextDl.type?TYPE_LABEL[nextDl.type]||nextDl.type:''}</div>
+      </div>
+      <button class="reco-action" onclick="startPomForSubject('${nextSub}')">▶ Pomodoro</button>
+    </div>`;
   }
 
-  // Phase timeline
-  const currentPhase = PHASES.find(p=>today>=new Date(p.from)&&today<=new Date(p.to))||PHASES[0];
-  const timeline = document.getElementById('phase-timeline');
+  // Next deadlines
+  html += `<div class="sec-label">Nächste Deadlines</div>
+  <div class="card" style="padding:0;overflow:hidden;">`;
+  if(upcoming.length===0){
+    html += `<div style="padding:14px;font-size:10px;color:var(--muted);text-align:center;">Keine offenen Deadlines ✓</div>`;
+  } else {
+    upcoming.forEach(d=>{
+      const days=daysUntil(d.date); const dl2=daysLabel(days);
+      const col=SUB_COL[d.subject]||'var(--muted2)';
+      html+=`<div class="dl-item" onclick="showTab('deadlines',document.querySelector('.tab-btn:nth-child(2))'))">
+        <div class="priority-dot" style="background:${PRIO_COL[d.priority]||'var(--muted)'}"></div>
+        <div class="dl-body">
+          <div class="dl-title">${d.label}</div>
+          <div class="dl-meta">
+            <span class="dl-subject" style="color:${col};">${d.subject}</span>
+            <span class="dl-type" style="color:${col};">${TYPE_LABEL[d.type]||d.type}</span>
+            <span class="dl-date">${fmtDate(d.date)} ${d.time||''}</span>
+          </div>
+        </div>
+        <div class="dl-days" style="color:${dl2.col};">${dl2.txt}</div>
+      </div>`;
+    });
+  }
+  html += `</div>`;
+
+  // Grades overview
+  if(avgList.length>0){
+    html += `<div class="sec-label">Notenübersicht</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:7px;margin-bottom:12px;">`;
+    avgList.forEach(({sub,avg})=>{
+      const col=gradeColor(avg); const subCol=SUB_COL[sub]||'var(--muted2)';
+      const bar=Math.min(100,Math.round((5.5-avg)/4.5*100));
+      html+=`<div class="card" style="padding:10px;border-color:${subCol}22;">
+        <div style="font-size:9px;color:${subCol};margin-bottom:4px;">${sub}</div>
+        <div class="grade-badge" style="color:${col};">${avg}</div>
+        <div class="grade-avg-bar" style="margin-top:6px;"><div class="grade-avg-fill" style="width:${bar}%;background:${col};"></div></div>
+      </div>`;
+    });
+    html += `</div>`;
+  }
+
+  document.getElementById('overview-content').innerHTML = html;
+}
+
+/* ── Deadline CRUD ──────────────────────────────────────────────────── */
+let dlFilter = 'alle';
+let dlEditId  = null;
+
+function filterDeadlines(f, btn){
+  dlFilter = f;
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  renderDeadlines();
+}
+
+function renderDeadlines(){
+  const all = loadDL().sort((a,b)=>new Date(a.date)-new Date(b.date));
+  const now=new Date(), weekEnd=new Date(now.getTime()+7*86400000);
+  let list;
+  if(dlFilter==='woche')   list=all.filter(d=>!d.done&&new Date(d.date)<=weekEnd&&daysUntil(d.date)>=0);
+  else if(dlFilter==='pruefung') list=all.filter(d=>!d.done&&['pruefung','klausur'].includes(d.type));
+  else if(dlFilter==='ha')  list=all.filter(d=>!d.done&&d.type==='ha');
+  else if(dlFilter==='done') list=all.filter(d=>d.done);
+  else list=all.filter(d=>!d.done);
+
+  const cont = document.getElementById('deadlines-list');
+  if(!list.length){
+    cont.innerHTML=`<div style="padding:20px;text-align:center;font-size:10px;color:var(--muted);">Keine Einträge. Klick "+ Hinzufügen" um eine Deadline anzulegen.</div>`;
+    return;
+  }
+
+  // Group by date
+  const groups={};
+  list.forEach(d=>{
+    const k=d.date||'0000-00-00';
+    if(!groups[k]) groups[k]=[];
+    groups[k].push(d);
+  });
+
+  let html='';
+  Object.entries(groups).sort(([a],[b])=>a.localeCompare(b)).forEach(([date,items])=>{
+    const days=daysUntil(date);
+    const dl2=daysLabel(days);
+    const groupLabel=days<0?'Vergangen':days===0?'Heute':days===1?'Morgen':'in '+days+' Tagen';
+    html+=`<div style="font-size:8px;letter-spacing:2px;text-transform:uppercase;color:${dl2.col};margin:12px 0 5px;padding-bottom:4px;border-bottom:1px solid var(--border);">${fmtDate(date)} — ${groupLabel}</div>`;
+    html+=`<div class="card" style="padding:0;overflow:hidden;margin-bottom:4px;">`;
+    items.forEach(d=>{
+      const col=SUB_COL[d.subject]||'var(--muted2)';
+      const dl3=daysLabel(daysUntil(d.date));
+      const urgClass=!d.done&&days<0?'overdue':!d.done&&days===0?'today':!d.done&&days<=7?'this-week':'';
+      html+=`<div class="dl-item ${d.done?'done':''} ${urgClass}">
+        <div class="dl-check ${d.done?'done':''}" onclick="event.stopPropagation();toggleDL('${d.id}')" style="background:${d.done?col:'transparent'};border-color:${d.done?col:'var(--border2)'};">${d.done?'✓':''}</div>
+        <div class="dl-body" onclick="openDeadlineForm('${d.id}')">
+          <div class="dl-title">${d.label}${d.notes?` <span style="font-size:8px;color:var(--muted);">✎</span>`:''}</div>
+          <div class="dl-meta">
+            <span class="dl-subject" style="color:${col};">${d.subject}</span>
+            <span class="dl-type" style="color:${col};">${TYPE_LABEL[d.type]||d.type}</span>
+            <span class="dl-date">${fmtDate(d.date)} ${d.time||''}</span>
+          </div>
+          ${d.notes?`<div style="font-size:9px;color:var(--muted);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${d.notes}</div>`:''}
+        </div>
+        <div class="dl-days" style="color:${dl3.col};">${dl3.txt}</div>
+        <div class="dl-actions">
+          <button class="btn-icon danger" onclick="event.stopPropagation();deleteDL('${d.id}')" title="Löschen">✕</button>
+        </div>
+      </div>`;
+    });
+    html+=`</div>`;
+  });
+  cont.innerHTML=html;
+}
+
+function toggleDL(id){
+  const dl=loadDL(); const i=dl.findIndex(d=>d.id===id);
+  if(i<0) return;
+  dl[i].done=!dl[i].done; saveDL(dl); renderDeadlines();
+  if(dl[i].done && window.earnXP) window.earnXP(25,'wis','Deadline erledigt');
+}
+function deleteDL(id){
+  if(!confirm('Deadline löschen?')) return;
+  const dl=loadDL().filter(d=>d.id!==id); saveDL(dl); renderDeadlines();
+}
+
+/* ── Deadline Form ──────────────────────────────────────────────────── */
+// populate subject dropdown
+(function(){
+  const sel=document.getElementById('dl-subject');
+  SUBJECTS.forEach(s=>{ const o=document.createElement('option'); o.value=s; o.textContent=s; sel.appendChild(o); });
+})();
+
+function openDeadlineForm(editId){
+  dlEditId = editId||null;
+  const sheet=document.getElementById('dl-sheet');
+  const title=document.getElementById('dl-sheet-title');
+  title.textContent = editId ? 'Deadline bearbeiten' : 'Deadline hinzufügen';
+
+  if(editId){
+    const dl=loadDL(); const d=dl.find(x=>x.id===editId);
+    if(d){
+      document.getElementById('dl-subject').value = d.subject||'';
+      document.getElementById('dl-label').value   = d.label||'';
+      document.getElementById('dl-date').value    = d.date||'';
+      document.getElementById('dl-time').value    = d.time||'';
+      document.getElementById('dl-type').value    = d.type||'sonstiges';
+      document.getElementById('dl-notes').value   = d.notes||'';
+      const pRadio=document.querySelector(`input[name="dl-prio"][value="${d.priority||'mittel'}"]`);
+      if(pRadio) pRadio.checked=true;
+    }
+  } else {
+    document.getElementById('dl-subject').value='';
+    document.getElementById('dl-label').value='';
+    document.getElementById('dl-date').value='';
+    document.getElementById('dl-time').value='';
+    document.getElementById('dl-type').value='ha';
+    document.getElementById('dl-notes').value='';
+    document.querySelector('input[name="dl-prio"][value="mittel"]').checked=true;
+  }
+  sheet.style.display='flex';
+  setTimeout(()=>document.getElementById('dl-label').focus(),100);
+}
+function closeDeadlineForm(){ document.getElementById('dl-sheet').style.display='none'; dlEditId=null; }
+function saveDeadline(){
+  const subject = document.getElementById('dl-subject').value.trim();
+  const label   = document.getElementById('dl-label').value.trim();
+  const date    = document.getElementById('dl-date').value;
+  if(!label){ document.getElementById('dl-label').focus(); return; }
+  if(!date) { document.getElementById('dl-date').focus(); return; }
+
+  const prio = document.querySelector('input[name="dl-prio"]:checked');
+  const entry = {
+    id:       dlEditId || uid(),
+    subject:  subject || 'Sonstiges',
+    label, date,
+    time:     document.getElementById('dl-time').value||'',
+    type:     document.getElementById('dl-type').value,
+    priority: prio ? prio.value : 'mittel',
+    done:     false,
+    notes:    document.getElementById('dl-notes').value.trim(),
+  };
+
+  const dl = loadDL();
+  if(dlEditId){
+    const i=dl.findIndex(d=>d.id===dlEditId);
+    if(i>=0){ entry.done=dl[i].done; dl[i]=entry; }
+  } else {
+    dl.push(entry);
+  }
+  saveDL(dl);
+  closeDeadlineForm();
+  renderDeadlines();
+  if(document.getElementById('tab-overview').classList.contains('active')) renderOverview();
+}
+
+/* ── Module / Grade Book ────────────────────────────────────────────── */
+let gradeEditSub = null;
+
+function renderModules(){
+  const grades=loadGrades(); const notes=loadSubjectNotes(); const dl=loadDL();
+  let html='';
+  MODULES_DEF.forEach(m=>{
+    const g=grades[m.code]||{entries:[], target:'', notes:''};
+    const avg=calcAvg(g.entries);
+    const subDeadlines=dl.filter(d=>d.subject===m.name&&!d.done&&daysUntil(d.date)>=0)
+      .sort((a,b)=>new Date(a.date)-new Date(b.date));
+    const nextDl=subDeadlines[0];
+    const avgCol=gradeColor(avg);
+
+    html+=`<div class="module-card" id="mod-${m.code}">
+      <div class="module-header" onclick="toggleModule('${m.code}')">
+        <span class="module-code" style="color:${m.col};border-color:${m.col}44;">${m.code}</span>
+        <div style="flex:1;min-width:0;">
+          <div class="module-name">${m.name}</div>
+          <div style="font-size:8px;color:var(--muted2);">${m.ects} ECTS · ${nextDl?`Nächstes: ${nextDl.label} in ${daysUntil(nextDl.date)}d`:'Keine Deadline'}</div>
+        </div>
+        <div class="module-grade-preview">
+          ${avg!==null?`<div class="grade-badge" style="font-size:18px;color:${avgCol};">${avg}</div>`:
+          `<div style="font-size:11px;color:var(--muted);">—</div>`}
+          <div style="font-size:7px;color:var(--muted);">Ø Note</div>
+        </div>
+        <span class="module-chevron">▶</span>
+      </div>
+      <div class="module-body">
+        <!-- Grades -->
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+          <div class="sec-div" style="margin:0;border:none;padding:0;">Noten</div>
+          <button class="btn-primary" style="padding:5px 10px;font-size:9px;" onclick="openGradeForm('${m.code}','${m.name}')">+ Note</button>
+        </div>
+        ${g.entries.length===0?
+          `<div style="font-size:9px;color:var(--muted);padding:8px 0;">Noch keine Noten eingetragen.</div>`:
+          `<div>${g.entries.slice().reverse().map(e=>`
+            <div class="grade-entry">
+              <span class="grade-entry-label">${e.label||'Note'}</span>
+              <span class="grade-entry-date">${e.date?fmtDate(e.date):''}</span>
+              ${e.weight&&e.weight!==1?`<span style="font-size:8px;color:var(--muted);">${e.weight}×</span>`:''}
+              <span class="grade-entry-val" style="color:${gradeColor(parseFloat(e.grade))};">${e.grade}</span>
+              <button class="btn-ghost danger" onclick="deleteGradeEntry('${m.code}','${e.id}')">✕</button>
+            </div>`).join('')}
+          </div>
+          ${avg!==null?`<div style="margin-top:8px;display:flex;align-items:center;gap:8px;">
+            <span style="font-size:9px;color:var(--muted2);">Durchschnitt:</span>
+            <span style="font-family:var(--display);font-size:14px;font-weight:700;color:${avgCol};">${avg}</span>
+          </div>`:''}`
+        }
+        <!-- Strategy -->
+        <div class="sec-div" style="margin-top:14px;">Strategie</div>
+        <div style="font-size:10px;color:var(--muted2);line-height:1.6;margin-bottom:10px;">${m.strat}</div>
+        <!-- Topics -->
+        <div class="sec-div">Themen</div>
+        <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:12px;">${m.topics.map(t=>`<span style="font-size:9px;padding:2px 7px;border-radius:1px;border:1px solid var(--border2);color:var(--muted2);">${t}</span>`).join('')}</div>
+        <!-- Notes -->
+        <div class="sec-div">Notizen</div>
+        <textarea class="form-textarea" placeholder="Eigene Notizen, Fragen, Aufgaben..."
+          onblur="saveModuleNote('${m.code}',this.value)"
+          style="margin-bottom:8px;">${notes[m.code]||''}</textarea>
+        <!-- Quick actions -->
+        <div style="display:flex;gap:6px;">
+          <button class="btn-secondary" style="font-size:9px;padding:6px 10px;" onclick="startPomForSubject('${m.name}')">▶ Pomodoro starten</button>
+          <button class="btn-secondary" style="font-size:9px;padding:6px 10px;" onclick="openDeadlineForm();document.getElementById('dl-subject').value='${m.name}';document.querySelector('.tab-btn:nth-child(2)').click();document.querySelector('.tab-btn:nth-child(2)').click();">+ Deadline</button>
+        </div>
+      </div>
+    </div>`;
+  });
+  document.getElementById('modules-content').innerHTML=html;
+}
+
+function toggleModule(code){
+  document.getElementById('mod-'+code).classList.toggle('open');
+}
+function saveModuleNote(code,val){
+  const n=loadSubjectNotes(); n[code]=val; saveSubjectNotes(n);
+}
+
+/* ── Grade Form ─────────────────────────────────────────────────────── */
+function openGradeForm(code, name){
+  gradeEditSub=code;
+  document.getElementById('grade-sheet-sub').textContent=name;
+  document.getElementById('g-grade').value='';
+  document.getElementById('g-label').value='';
+  document.getElementById('g-weight').value='1';
+  document.getElementById('grade-sheet').style.display='flex';
+  setTimeout(()=>document.getElementById('g-grade').focus(),80);
+}
+function closeGradeForm(){ document.getElementById('grade-sheet').style.display='none'; gradeEditSub=null; }
+function saveGrade(){
+  const gradeVal=parseFloat(document.getElementById('g-grade').value);
+  if(isNaN(gradeVal)||gradeVal<1||gradeVal>5){ document.getElementById('g-grade').focus(); return; }
+  const g=loadGrades();
+  if(!g[gradeEditSub]) g[gradeEditSub]={entries:[],notes:''};
+  g[gradeEditSub].entries.push({
+    id:'g'+Date.now(),
+    label: document.getElementById('g-label').value.trim()||'Note',
+    grade: Math.round(gradeVal*10)/10,
+    weight: parseFloat(document.getElementById('g-weight').value)||1,
+    date: new Date().toISOString().split('T')[0],
+  });
+  saveGrades(g); closeGradeForm(); renderModules();
+}
+function deleteGradeEntry(code, entryId){
+  const g=loadGrades();
+  if(g[code]) g[code].entries=g[code].entries.filter(e=>e.id!==entryId);
+  saveGrades(g); renderModules();
+}
+
+/* ── Pomodoro bridge ────────────────────────────────────────────────── */
+function startPomForSubject(sub){
+  window.pomSubject = sub;
+  if(window.pomShowPicker) window.pomShowPicker();
+  const btns = document.querySelectorAll('.pom-sub-btn');
+  btns.forEach(b=>{ b.classList.toggle('selected', b.textContent===sub); });
+}
+
+/* ── Lernplan ───────────────────────────────────────────────────────── */
+(function buildLernplan(){
+  const today=new Date();
+  const currentPhase=PHASES.find(p=>today>=new Date(p.from)&&today<=new Date(p.to))||PHASES[0];
+
+  const timeline=document.getElementById('phase-timeline');
+  if(!timeline) return;
   PHASES.forEach(p=>{
-    const isActive = p.id===currentPhase.id;
-    const isPast   = new Date(p.to)<today;
-    timeline.innerHTML+=`<div style="flex:1;min-width:90px;padding:8px 10px;border-radius:3px;border:1px solid ${isActive?p.badgeCol:'var(--border)'};background:${isActive?p.badgeCol+'0f':'var(--card)'};opacity:${isPast?0.4:1};">
-      <div style="font-size:8px;color:${isActive?p.badgeCol:'var(--muted2)'};letter-spacing:2px;text-transform:uppercase;margin-bottom:3px;">${p.label}</div>
-      <div style="font-size:11px;font-family:var(--display);font-style:italic;font-weight:700;color:${isActive?'var(--accent)':'var(--text)'};">${p.title}</div>
-      <div style="font-size:9px;color:var(--muted2);margin-top:3px;">${fmtDate(p.from)} – ${fmtDate(p.to)}</div>
+    const isActive=p.id===currentPhase.id, isPast=new Date(p.to)<today;
+    timeline.innerHTML+=`<div style="flex:1;min-width:88px;padding:8px 10px;border:1px solid ${isActive?p.badgeCol:'var(--border)'};background:${isActive?p.badgeCol+'0f':'var(--card)'};opacity:${isPast?0.4:1};">
+      <div style="font-size:7px;color:${isActive?p.badgeCol:'var(--muted2)'};letter-spacing:2px;text-transform:uppercase;margin-bottom:3px;">${p.label}</div>
+      <div style="font-size:11px;font-family:var(--display);font-weight:700;">${p.title}</div>
+      <div style="font-size:8px;color:var(--muted2);margin-top:3px;">${fmtDate(p.from)} – ${fmtDate(p.to)}</div>
     </div>`;
   });
 
-  // Current phase detail
   const pd=document.getElementById('phase-detail');
-  pd.innerHTML=`<div style="margin-bottom:20px;">
+  if(pd) pd.innerHTML=`<div style="margin-bottom:20px;">
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
-      <span style="font-size:9px;padding:2px 8px;border-radius:2px;background:${currentPhase.badgeCol}22;color:${currentPhase.badgeCol};font-weight:700;letter-spacing:1px;">JETZT — ${currentPhase.badge}</span>
-      <div style="font-family:var(--display);font-size:18px;font-style:italic;font-weight:700;">${currentPhase.title}</div>
+      <span style="font-size:9px;padding:2px 8px;background:${currentPhase.badgeCol}22;color:${currentPhase.badgeCol};font-weight:700;letter-spacing:1px;">JETZT — ${currentPhase.badge}</span>
+      <div style="font-family:var(--display);font-size:16px;font-weight:900;">${currentPhase.title}</div>
     </div>
     <div style="font-size:11px;color:var(--muted2);margin-bottom:14px;">${currentPhase.desc}</div>
-    <div class="sec-label">Tagesplanung</div>
+    <div class="sec-div">Tagesplanung</div>
     ${currentPhase.daily.map(d=>`<div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;">
-      <span style="font-size:10px;width:110px;color:${d.col};font-weight:600;">${d.sub}</span>
-      <div style="flex:1;height:6px;background:var(--border);border-radius:3px;overflow:hidden;"><div style="height:100%;background:${d.col};width:${(d.h/5)*100}%;opacity:0.8;"></div></div>
-      <span style="font-size:10px;color:var(--muted2);width:30px;">${d.h}h</span>
+      <span style="font-size:10px;width:110px;color:${d.col};font-weight:600;flex-shrink:0;">${d.sub}</span>
+      <div style="flex:1;height:5px;background:var(--border);border-radius:2px;overflow:hidden;"><div style="height:100%;background:${d.col};width:${(d.h/5)*100}%;"></div></div>
+      <span style="font-size:10px;color:var(--muted2);width:28px;">${d.h}h</span>
     </div>`).join('')}
-    <div class="sec-label" style="margin-top:16px;">Taktik</div>
+    <div class="sec-div" style="margin-top:16px;">Taktik</div>
     <div class="card" style="padding:10px 14px;">${currentPhase.tactics.map(t=>`<div style="display:flex;gap:10px;margin-bottom:8px;font-size:11px;"><span style="color:${currentPhase.badgeCol};flex-shrink:0;">→</span><span>${t}</span></div>`).join('')}</div>
   </div>`;
 
-  // All phases
   const ap=document.getElementById('all-phases');
+  if(!ap) return;
   PHASES.forEach(p=>{
     const isPast=new Date(p.to)<today;
-    ap.innerHTML+=`<div class="card" style="margin-bottom:8px;border-color:${p.id===currentPhase.id?p.badgeCol+'44':'var(--border)'};opacity:${isPast?0.5:1};">
+    ap.innerHTML+=`<div class="card" style="margin-bottom:8px;border-color:${p.id===currentPhase.id?p.badgeCol+'55':'var(--border)'};opacity:${isPast?0.5:1};">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;">
         <div><span style="font-size:9px;color:${p.badgeCol};font-weight:700;letter-spacing:1px;margin-right:8px;">${p.label.toUpperCase()}</span>
-          <span style="font-family:var(--display);font-size:14px;font-style:italic;font-weight:700;">${p.title}</span></div>
-        <span style="font-size:9px;color:var(--muted2);">${fmtDate(p.from)} – ${fmtDate(p.to)}</span>
+          <span style="font-family:var(--display);font-size:13px;font-weight:700;">${p.title}</span></div>
+        <span style="font-size:8px;color:var(--muted2);">${fmtDate(p.from)} – ${fmtDate(p.to)}</span>
       </div>
       <div style="font-size:10px;color:var(--muted2);margin-bottom:8px;">${p.desc}</div>
-      <div style="display:flex;gap:6px;flex-wrap:wrap;">${p.daily.map(d=>`<span style="font-size:9px;padding:2px 6px;border-radius:2px;border:1px solid ${d.col}33;color:${d.col};">${d.sub} ${d.h}h</span>`).join('')}</div>
+      <div style="display:flex;gap:5px;flex-wrap:wrap;">${p.daily.map(d=>`<span style="font-size:8px;padding:2px 6px;border-radius:1px;border:1px solid ${d.col}33;color:${d.col};">${d.sub} ${d.h}h</span>`).join('')}</div>
     </div>`;
   });
-
-  // Modules
-  const ml=document.getElementById('modules-list');
-  let grades={};
-  try{grades=JSON.parse(localStorage.getItem('uni-grades')||'{}');}catch{}
-  MODULES.forEach(m=>{
-    const days=daysUntil(m.examDate);
-    const urgent=days<=14;
-    ml.innerHTML+=`<div class="card" style="margin-bottom:10px;border-color:${urgent?m.col+'44':'var(--border)'};">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;">
-        <div style="flex:1;">
-          <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
-            <span class="tag" style="color:${m.col};border-color:${m.col}44;background:${m.col}11;">${m.code}</span>
-          </div>
-          <div style="font-family:var(--display);font-size:16px;font-style:italic;font-weight:700;color:var(--accent);">${m.name}</div>
-          <div style="font-size:9px;color:var(--muted2);">${m.ects} ECTS</div>
-        </div>
-        <div style="text-align:right;">
-          <div style="font-size:11px;color:${urgent?'#ef4444':m.col};font-weight:700;">${m.examLabel}</div>
-          <div style="font-size:9px;color:${urgent?'#ef4444':'var(--muted2)'};margin-top:2px;">in ${days} Tagen</div>
-          <div style="margin-top:6px;font-size:9px;color:var(--muted2);">Note: <span style="font-size:12px;font-weight:700;color:${grades[m.code]?m.col:'var(--muted2)'};">${grades[m.code]||'—'}</span></div>
-        </div>
-      </div>
-      <div style="display:flex;gap:3px;margin-bottom:10px;">${Array.from({length:5}).map((_,i)=>`<div style="width:20px;height:3px;border-radius:1px;background:${i<m.difficulty?m.col:'var(--border)'}"></div>`).join('')}<span style="font-size:9px;color:var(--muted2);margin-left:6px;">Schwierigkeit</span></div>
-      <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px;">${m.topics.map(t=>`<span style="font-size:9px;padding:2px 6px;border-radius:2px;border:1px solid var(--border2);color:var(--muted2);">${t}</span>`).join('')}</div>
-      <div style="font-size:10px;color:var(--muted2);border-top:1px solid var(--border);padding-top:8px;"><span style="color:${m.col};">→ </span>${m.strategy}</div>
-    </div>`;
-  });
-
-  // Termine
-  let doneDl={};
-  try{doneDl=JSON.parse(localStorage.getItem('uni-done')||'{}');}catch{}
-  function renderTermine(){
-    const tl=document.getElementById('termine-list');
-    tl.innerHTML='';
-    const done=EXAMS.filter(e=>doneDl[e.id]).length;
-    document.getElementById('termine-progress').textContent=done+'/'+EXAMS.length+' erledigt';
-    EXAMS.forEach(e=>{
-      const days=daysUntil(e.date);
-      const isDone=!!doneDl[e.id];
-      const isPast=days<0, isUrgent=days>=0&&days<=7;
-      const row=document.createElement('div');
-      row.className='deadline-row'+(isDone?' done':'');
-      row.innerHTML=`<div class="checkbox" style="border-color:${isDone?e.col:'var(--border2)'};background:${isDone?e.col:'transparent'};">${isDone?'✓':''}</div>
-        <div class="dl-dot" style="background:${e.col};"></div>
-        <div style="flex:1;"><div style="font-size:11px;font-weight:600;"><span style="color:${e.col};">${e.sub}</span> — ${e.label}</div><div style="font-size:9px;color:var(--muted2);">${e.type}</div></div>
-        <div style="text-align:right;">
-          <div style="font-size:11px;color:${isUrgent?'#ef4444':isPast?'var(--muted)':'var(--muted2)'};">${fmtDate(e.date)} ${e.time}</div>
-          <div style="font-size:9px;color:${isUrgent?'#ef4444':'var(--muted2)'};">${isPast?'vorbei':'in '+days+'d'}</div>
-        </div>`;
-      row.onclick=()=>{doneDl[e.id]=!doneDl[e.id];try{localStorage.setItem('uni-done',JSON.stringify(doneDl));}catch{}renderTermine();};
-      tl.appendChild(row);
-    });
-  }
-  renderTermine();
 })();
+
+/* ── Keyboard shortcuts ─────────────────────────────────────────────── */
+document.getElementById('dl-sheet').addEventListener('keydown',e=>{
+  if(e.key==='Enter'&&e.target.tagName!=='TEXTAREA') saveDeadline();
+  if(e.key==='Escape') closeDeadlineForm();
+});
+
+/* ── Init ───────────────────────────────────────────────────────────── */
+renderOverview();
 </script>
 {% endblock %}

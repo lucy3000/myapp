@@ -70,6 +70,13 @@ function tickClock() {
   set('bar-year', y);   setTxt('pct-year', y);
   set('bar-month', m);  setTxt('pct-month', m);
   set('bar-week', w);   setTxt('pct-week', w);
+  // Drawer clock sync
+  const dc = document.getElementById('drawer-clock');
+  const dd = document.getElementById('drawer-date');
+  if (dc) dc.textContent = now.toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'});
+  if (dd) dd.textContent = DAYS_DE_FULL[now.getDay()].slice(0,2) + ' ' + now.getDate() + '. ' + MONTHS_DE[now.getMonth()];
+  set('d-bar-year', y);  setTxt('d-pct-year', y);
+  set('d-bar-month', m); setTxt('d-pct-month', m);
 }
 setInterval(tickClock, 1000);
 tickClock();
@@ -378,35 +385,111 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 
+// ── Motivation content ─────────────────────────────────────────────────────────
+const MOTIV_WINDOWS = [
+  { type:'💬 Motivations-Zitat', col:'#a855f7', winTitle:'✎ Motivation.txt',
+    entries:[
+      { msg:'Das Einzige, was zwischen dir und deinem Ziel steht, ist die Geschichte, die du dir selbst erzählst.',
+        sub:'Jede Lernsession zählt. Auch kurze. Auch die schwierigen.', src:'— Jordan Belfort (angepasst)' },
+      { msg:'Du musst nicht perfekt starten. Du musst nur starten.',
+        sub:'Ein Pomodoro jetzt ist besser als der perfekte Plan morgen.', src:'— unbekannt' },
+      { msg:'Erfolg ist die Summe kleiner Anstrengungen, täglich wiederholt.',
+        sub:'Spaced Repetition funktioniert — wenn man es tut.', src:'— Robert Collier' },
+      { msg:'Die Müdigkeit, die du jetzt fühlst, ist die Investition in die Person, die du werden willst.',
+        sub:'Active Recall ist anstrengend — das ist der Beweis, dass es wirkt.', src:'— unbekannt' },
+      { msg:'Vergleiche dich nicht mit anderen. Vergleiche dich mit dem, der du gestern warst.',
+        sub:'Ein Tag, eine Session, ein Konzept — das reicht.', src:'— Jordan B. Peterson' },
+    ]},
+  { type:'🧠 Lernwissenschaft', col:'#22d3ee', winTitle:'◉ Kognitions-Tipp',
+    entries:[
+      { msg:'Active Recall schlägt passives Lesen um Faktor 3.',
+        sub:'Klappe das Buch zu. Schreib alles auf, was du weißt. DANN vergleiche.', src:'— Karpicke & Roediger, 2008' },
+      { msg:'Spaced Repetition: Das Vergessen ist kein Feind, es ist der Mechanismus.',
+        sub:'Wiederhole Stoff nach 1, 3, 7 und 14 Tagen — die Kurve flacht dramatisch ab.', src:'— Ebbinghaus Forgetting Curve' },
+      { msg:'Interleaving: Wechsle heute zwischen zwei Fächern.',
+        sub:'Gemischtes Üben fühlt sich schwerer an, produziert aber 20–30% bessere Ergebnisse.', src:'— Taylor & Rohrer, 2010' },
+      { msg:'Schlaf konsolidiert Gedächtnis — ohne Ausnahme.',
+        sub:'Lernen nach Mitternacht kostet mehr als es bringt. 7–8h sind keine Faulheit.', src:'— Matthew Walker, Why We Sleep' },
+      { msg:'Die "Illusion of Knowing": Nochmal lesen fühlt sich wie Lernen an — ist es aber nicht.',
+        sub:'Wähle Active Recall über Highlighting. Immer.', src:'— Bjork, 1994' },
+    ]},
+  { type:'⚡ Energie-Check', col:'#f59e0b', winTitle:'⚡ Status.exe',
+    entries:[
+      { msg:'Hohe Energie → jetzt das Schwerste angehen.',
+        sub:'Mechanik 2, KL1, DGL — die schwierigen Konzepte jetzt, nicht nach dem Abendessen.', src:'— Ultradian Rhythm Research' },
+      { msg:'Niedrige Energie? Wiederholung statt neuem Stoff.',
+        sub:'Alte Aufgaben durchschauen, Karteikarten, Notizen lesen — auch das zählt.', src:'— Empfehlung: Life OS' },
+      { msg:'Trinke jetzt ein Glas Wasser.',
+        sub:'Dehydration von 2% reduziert kognitive Leistung um bis zu 20%. Es klingt simpel — weil es so ist.', src:'— Journal of Nutrition, 2012' },
+      { msg:'90 Minuten Deep Work ist das Optimum des Gehirns.',
+        sub:'Danach sinkt die Effizienz stark. Mache eine echte Pause — kein Scrollen.', src:'— Huberman Lab Podcast' },
+    ]},
+  { type:'🎯 Prüfungs-Coaching', col:'#ef4444', winTitle:'🎯 Exam-Coach.exe',
+    entries:[
+      { msg:'2 Wochen vor der Prüfung: Aufgaben lösen, nicht Stoff wiederholen.',
+        sub:'Alte Klausuren sind dein bestes Werkzeug. Ohne Lösungen. Zeit stoppen.', src:'— Testing Effect, 2006' },
+      { msg:'Eine Formelsammlung handschriftlich zu erstellen ist Lernen.',
+        sub:'Der Akt des Schreibens kodiert Informationen tiefer als Tippen.', src:'— Mueller & Oppenheimer, 2014' },
+      { msg:'Erkläre es wie einem 10-Jährigen.',
+        sub:'Wenn du es nicht einfach erklären kannst, hast du es noch nicht wirklich verstanden.', src:'— Feynman-Technik' },
+    ]},
+  { type:'🏆 Fortschritt', col:'#4ade80', winTitle:'★ Achievements',
+    entries:[
+      { msg:'Jede Pomodoro-Session ist eine Investition in deine Zukunft.',
+        sub:'25 Minuten heute = ein Konzept besser verstanden = eine Prüfung sicherer bestanden.', src:'— Life OS Motivation' },
+      { msg:'Du bist weiter als gestern.',
+        sub:'Fortschritt ist nicht immer sichtbar. Vertrau dem Prozess und den Daten.', src:'— Life OS' },
+      { msg:'Disziplin ist die Brücke zwischen Zielen und Ergebnissen.',
+        sub:'Du musst es nicht mögen. Du musst es nur tun.', src:'— Jim Rohn' },
+    ]},
+];
+
+function _randEntry(arr) { return arr[Math.floor(Math.random()*arr.length)]; }
+
 // ── Reminder Modal ─────────────────────────────────────────────────────────────
 function showReminder(force=false) {
   if (pomState === 'running' && !force) return;
   if (!force && Date.now() < nextReminderAt) return;
   nextReminderAt = Date.now() + 20*60*1000;
 
-  const urgent = EXAMS_GLOBAL
-    .map(e=>({...e, days:daysUntilGlobal(e.date)}))
-    .filter(e=>e.days>=0&&e.days<=14)
-    .sort((a,b)=>a.days-b.days)[0];
+  let dlAll = [];
+  try { dlAll = JSON.parse(localStorage.getItem('uni-dl-v3')||'[]'); } catch {}
+  const urgent = dlAll
+    .filter(d => !d.done)
+    .map(d => ({...d, days: daysUntilGlobal(d.date)}))
+    .filter(d => d.days >= 0 && d.days <= 10)
+    .sort((a,b) => a.days - b.days)[0];
 
-  const titleEl = document.getElementById('reminder-title');
-  const bodyEl  = document.getElementById('reminder-body');
-  const tagEl   = document.getElementById('reminder-tag');
+  const titleEl  = document.getElementById('reminder-title');
+  const bodyEl   = document.getElementById('reminder-body');
+  const tagEl    = document.getElementById('reminder-tag');
+  const srcEl    = document.getElementById('reminder-source');
+  const winTitle = document.getElementById('reminder-win-title');
+
+  // Pick a motivation entry or show urgent deadline
+  const cat = _randEntry(MOTIV_WINDOWS);
+  const entry = _randEntry(cat.entries);
 
   if (urgent) {
-    if (titleEl) titleEl.textContent = `${urgent.sub} — ${urgent.label}`;
-    if (bodyEl)  bodyEl.textContent  = `Noch ${urgent.days} Tag${urgent.days===1?'':'e'} bis zur Abgabe. Starte jetzt eine Lernsession.`;
-    if (tagEl)   tagEl.style.color   = urgent.col;
-    window._reminderSubject = urgent.sub;
+    const subCol = urgent.col || 'var(--pink)';
+    if (winTitle) winTitle.textContent = '⏰ Deadline-Alarm';
+    if (tagEl)   { tagEl.textContent = '🚨 ' + urgent.subject; tagEl.style.color = subCol; }
+    if (titleEl) titleEl.textContent = `${urgent.label} in ${urgent.days} Tag${urgent.days===1?'':'en'}!`;
+    if (bodyEl)  bodyEl.textContent  = 'Starte jetzt eine Lernsession. Jede Stunde zählt.';
+    if (srcEl)   srcEl.textContent   = '— Life OS Deadline-Monitor';
+    window._reminderSubject = urgent.subject;
   } else {
-    if (titleEl) titleEl.textContent = 'Zeit zu lernen!';
-    if (bodyEl)  bodyEl.textContent  = REMINDER_TIPS[Math.floor(Math.random()*REMINDER_TIPS.length)];
-    if (tagEl)   tagEl.style.color   = 'var(--accent)';
+    if (winTitle) winTitle.textContent = cat.winTitle;
+    if (tagEl)   { tagEl.textContent = cat.type; tagEl.style.color = cat.col; }
+    if (titleEl) titleEl.textContent = entry.msg;
+    if (bodyEl)  bodyEl.textContent  = entry.sub;
+    if (srcEl)   srcEl.textContent   = entry.src;
     window._reminderSubject = pomSubject;
   }
   const modal = document.getElementById('reminder-modal');
   if (modal) modal.style.display = 'flex';
 }
+
 function closeReminder() {
   const modal = document.getElementById('reminder-modal');
   if (modal) modal.style.display = 'none';
@@ -419,8 +502,60 @@ function reminderStart() {
 function reminderSnooze() {
   nextReminderAt = Date.now() + 30*60*1000;
   closeReminder();
-  addToast('⏸ Erinnert in 30 min', 'Snooze aktiviert.', 'info');
+  addToast('⏸ Snooze 30 min', 'Bis gleich!', 'info');
 }
+
+// ── Floating motivation bubbles ────────────────────────────────────────────────
+let motivBubbleCount = 0;
+function showMotivBubble() {
+  const stack = document.getElementById('motiv-stack');
+  if (!stack) return;
+  // Max 3 visible at once
+  const existing = stack.querySelectorAll('.motiv-bubble');
+  if (existing.length >= 3) existing[0].remove();
+
+  const cat   = _randEntry(MOTIV_WINDOWS);
+  const entry = _randEntry(cat.entries);
+  const id    = 'mb-' + Date.now();
+
+  const el = document.createElement('div');
+  el.className = 'motiv-bubble';
+  el.id = id;
+  el.innerHTML = `
+    <div class="rw-bar">
+      <div class="rw-dots">
+        <div class="rw-dot r" onclick="closeMotivBubble('${id}')" style="cursor:pointer;"></div>
+        <div class="rw-dot y"></div>
+        <div class="rw-dot g"></div>
+      </div>
+      <div class="rw-title">${cat.winTitle}</div>
+      <div class="rw-close" onclick="closeMotivBubble('${id}')">✕</div>
+    </div>
+    <div class="motiv-bubble-body">
+      <div style="font-size:9px;letter-spacing:1.5px;text-transform:uppercase;font-weight:700;color:${cat.col};margin-bottom:7px;">${cat.type}</div>
+      <div class="motiv-bubble-msg">${entry.msg}</div>
+      <div class="motiv-bubble-sub">${entry.sub}</div>
+      <div style="font-size:9px;color:var(--muted);margin-top:5px;font-style:italic;">${entry.src}</div>
+    </div>`;
+  stack.appendChild(el);
+
+  // Auto-dismiss after 18 seconds
+  setTimeout(() => closeMotivBubble(id), 18000);
+}
+
+function closeMotivBubble(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.classList.add('hiding');
+  setTimeout(() => el.remove(), 300);
+}
+
+// Show first bubble after 90 seconds, then every 25 min
+setTimeout(() => showMotivBubble(), 90000);
+setInterval(() => showMotivBubble(), 25 * 60 * 1000);
+
+// Expose for sidebar button
+window.showMotivBubble = showMotivBubble;
 
 // ── Inactivity-based reminder ──────────────────────────────────────────────────
 document.addEventListener('mousemove', () => { lastActivity = Date.now(); });
@@ -449,6 +584,7 @@ document.addEventListener('keydown', e => {
   if (e.key === 'Escape') {
     closeFocus();
     closeReminder();
+    closeDrawer();
   }
   if ((e.key === 'p' || e.key === 'P') && pomState === 'idle' && !e.ctrlKey && !e.metaKey) {
     pomShowPicker();
@@ -457,3 +593,66 @@ document.addEventListener('keydown', e => {
     focusMode ? closeFocus() : openFocus();
   }
 });
+
+// ── Mobile Drawer ──────────────────────────────────────────────────────────────
+let drawerOpen = false;
+
+function toggleDrawer() {
+  drawerOpen ? closeDrawer() : openDrawer();
+}
+function openDrawer() {
+  drawerOpen = true;
+  document.getElementById('drawer').classList.add('open');
+  document.getElementById('drawer-overlay').classList.add('open');
+  document.getElementById('hamburger-btn').classList.add('open');
+  syncDrawerData();
+  document.body.style.overflow = 'hidden';
+}
+function closeDrawer() {
+  drawerOpen = false;
+  document.getElementById('drawer').classList.remove('open');
+  document.getElementById('drawer-overlay').classList.remove('open');
+  const hb = document.getElementById('hamburger-btn');
+  if (hb) hb.classList.remove('open');
+  document.body.style.overflow = '';
+}
+function syncDrawerData() {
+  // Streak
+  try {
+    const streak = parseInt(localStorage.getItem('streak') || '0');
+    if (streak > 0) {
+      const ds = document.getElementById('drawer-streak');
+      if (ds) ds.style.display = '';
+      const dn = document.getElementById('drawer-streak-num');
+      const db = document.getElementById('drawer-streak-sub');
+      if (dn) dn.textContent = streak;
+      if (db) db.textContent = 'Tag' + (streak === 1 ? '' : 'e');
+    }
+  } catch {}
+  // Pomodoro status
+  const ps = document.getElementById('drawer-pom-status');
+  if (ps) {
+    if (pomState === 'running') ps.textContent = '▶ ' + pomSubject + ' läuft — ' + fmt(pomSecs);
+    else if (pomState === 'break') ps.textContent = '☕ Pause — ' + fmt(pomSecs);
+    else if (pomState === 'paused') ps.textContent = '⏸ Pausiert — ' + fmt(pomSecs);
+    else ps.textContent = pomSessions > 0 ? pomSessions + ' Sessions heute' : '—';
+  }
+  // Gamify from gamify.js
+  try {
+    const gs = JSON.parse(localStorage.getItem('g-state') || '{}');
+    const xp = gs.xp || 0;
+    const level = Math.max(1, Math.floor((1 + Math.sqrt(1 + 8 * xp / 50)) / 2));
+    const thisXP = level * (level - 1) * 50;
+    const nextXP = (level + 1) * level * 50;
+    const pct = nextXP > thisXP ? Math.min(100, Math.round((xp - thisXP) / (nextXP - thisXP) * 100)) : 100;
+    const names = [[0,'Schlafwandler'],[3,'Erwachter'],[6,'Lernender'],[10,'Fokussierter'],[15,'Meister'],[22,'Experte'],[30,'Legende'],[40,'Übermensch']];
+    let cls = names[0][1];
+    for (const [t,n] of names) { if (level >= t) cls = n; else break; }
+    const dl = document.getElementById('drawer-level');
+    const dc = document.getElementById('drawer-class');
+    const dx = document.getElementById('drawer-xp-bar');
+    if (dl) dl.textContent = 'Lv.' + level;
+    if (dc) dc.textContent = cls;
+    if (dx) dx.style.width = pct + '%';
+  } catch {}
+}

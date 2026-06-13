@@ -1,209 +1,423 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="page">
+<div class="page full-width" style="padding-bottom:24px;">
 
-  <!-- Hero -->
-  <div class="dash-hero">
-    <div style="display:flex;justify-content:space-between;align-items:flex-start;">
-      <div>
-        <div style="font-size:9px;color:var(--muted2);letter-spacing:3px;text-transform:uppercase;margin-bottom:8px;" id="hero-day">— · SoSe 2026</div>
-        <div style="font-family:var(--display);font-size:28px;font-style:italic;font-weight:700;line-height:1;color:var(--accent);" id="hero-phase">—</div>
-        <div style="font-size:10px;margin-top:6px;font-weight:700;" id="hero-focus"></div>
-        <div style="font-size:10px;color:var(--muted2);margin-top:10px;font-style:italic;max-width:280px;line-height:1.5;" id="hero-quote"></div>
+  <!-- Greeting -->
+  <div style="margin-bottom:20px;">
+    <div style="font-family:var(--display);font-size:26px;font-weight:900;letter-spacing:1px;color:var(--text);" id="dash-greeting">Guten Tag!</div>
+    <div style="font-size:13px;color:var(--muted2);margin-top:5px;" id="dash-sub">—</div>
+  </div>
+
+  <!-- MAIN GRID -->
+  <div class="db-layout">
+    <div class="db-left">
+
+      <!-- 2×2 stat cards -->
+      <div class="db-stat-grid">
+
+        <!-- Nächste Deadline -->
+        <div class="dbc" style="--c1:245,158,11;">
+          <div class="dbc-label">Nächste Deadline</div>
+          <div style="display:flex;align-items:baseline;gap:8px;margin:8px 0 2px;">
+            <span class="dbc-big" id="dc-days">—</span>
+            <span class="dbc-unit">Tage</span>
+          </div>
+          <div class="dbc-name" id="dc-name">—</div>
+          <div style="display:flex;gap:20px;margin-top:12px;padding-top:10px;border-top:1px solid rgba(var(--c1),0.15);">
+            <div><div class="dbc-sec" id="dc-week">0</div><div class="dbc-sec-lbl">diese Woche</div></div>
+            <div><div class="dbc-sec" id="dc-open">0</div><div class="dbc-sec-lbl">offen gesamt</div></div>
+          </div>
+          <div class="dbc-deco">⏰</div>
+        </div>
+
+        <!-- Lernzeit -->
+        <div class="dbc" style="--c1:255,45,120;">
+          <div class="dbc-label">Lernzeit heute</div>
+          <div style="display:flex;align-items:baseline;gap:8px;margin:8px 0 2px;">
+            <span class="dbc-big" id="dc-pom">0</span>
+            <span class="dbc-unit">Sessions</span>
+          </div>
+          <div style="height:5px;background:rgba(var(--c1),0.15);border-radius:3px;margin:10px 0 8px;overflow:hidden;">
+            <div id="dc-pom-bar" style="height:100%;background:rgba(var(--c1),1);border-radius:3px;width:0%;transition:width 0.5s;"></div>
+          </div>
+          <div style="display:flex;gap:20px;">
+            <div><div class="dbc-sec" id="dc-min">0</div><div class="dbc-sec-lbl">Minuten</div></div>
+            <div><div class="dbc-sec">4</div><div class="dbc-sec-lbl">Ziel</div></div>
+          </div>
+          <div class="dbc-deco">🍅</div>
+        </div>
+
+        <!-- Habits -->
+        <div class="dbc" style="--c1:0,255,157;">
+          <div class="dbc-label">Habits heute</div>
+          <div style="display:flex;align-items:baseline;gap:8px;margin:8px 0 2px;">
+            <span class="dbc-big" id="dc-hdone">0</span>
+            <span class="dbc-unit">/ 6 erledigt</span>
+          </div>
+          <div style="height:5px;background:rgba(var(--c1),0.15);border-radius:3px;margin:10px 0 8px;overflow:hidden;">
+            <div id="dc-habit-bar" style="height:100%;background:rgba(var(--c1),1);border-radius:3px;width:0%;transition:width 0.5s;"></div>
+          </div>
+          <div class="dbc-name" id="dc-hpct-label">Noch nicht gestartet</div>
+          <div class="dbc-deco">✅</div>
+        </div>
+
+        <!-- XP / Level -->
+        <div class="dbc" style="--c1:168,85,247;">
+          <div class="dbc-label">Gamify · XP</div>
+          <div style="display:flex;align-items:baseline;gap:8px;margin:8px 0 2px;">
+            <span class="dbc-big" id="dc-level">1</span>
+            <span class="dbc-unit">Level</span>
+          </div>
+          <div style="height:5px;background:rgba(var(--c1),0.15);border-radius:3px;margin:10px 0 8px;overflow:hidden;">
+            <div id="dc-xp-bar" style="height:100%;background:rgba(var(--c1),1);border-radius:3px;width:0%;transition:width 0.5s;"></div>
+          </div>
+          <div style="display:flex;gap:20px;">
+            <div><div class="dbc-sec" id="dc-xp">0</div><div class="dbc-sec-lbl">XP</div></div>
+            <div><div class="dbc-sec" id="dc-streak">0</div><div class="dbc-sec-lbl">Streak</div></div>
+          </div>
+          <div class="dbc-deco">⚡</div>
+        </div>
+
+      </div><!-- /stat grid -->
+
+      <!-- Bottom: deadline list + today panel -->
+      <div class="db-bottom">
+
+        <div class="card" style="margin:0;padding:0;overflow:hidden;display:flex;flex-direction:column;">
+          <div style="padding:12px 16px 10px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border);">
+            <div style="font-size:14px;font-weight:700;">Upcoming</div>
+            <a href="/dashboard/uni" style="font-size:11px;color:var(--neon);text-decoration:none;font-weight:600;">alle →</a>
+          </div>
+          <div id="upcoming-list" style="flex:1;overflow-y:auto;max-height:320px;"></div>
+        </div>
+
+        <div class="card" style="margin:0;display:flex;flex-direction:column;gap:0;">
+          <div style="font-size:14px;font-weight:700;margin-bottom:3px;">Heute</div>
+          <div style="font-size:11px;color:var(--muted2);margin-bottom:12px;" id="today-date"></div>
+          <div id="today-events" style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:16px;min-height:30px;"></div>
+
+          <div style="font-size:10px;color:var(--muted2);font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px;">Habits</div>
+          <div id="habits-mini"></div>
+
+          <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--border);">
+            <div style="font-size:10px;color:var(--muted2);font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px;">Quick Capture</div>
+            <div style="display:flex;gap:6px;margin-bottom:8px;">
+              <input id="cap-in" class="form-input" style="flex:1;padding:8px 11px;" placeholder="Aufgabe oder Notiz..." onkeydown="if(event.key==='Enter')addCap()">
+              <button onclick="addCap()" class="btn-primary" style="flex-shrink:0;padding:8px 16px;font-size:12px;">+</button>
+            </div>
+            <div id="cap-list"></div>
+          </div>
+        </div>
+
       </div>
-      <div style="text-align:right;flex-shrink:0;" id="hero-next-wrap">
-        <div style="font-size:9px;color:var(--muted2);letter-spacing:2px;text-transform:uppercase;margin-bottom:4px;">Nächstes</div>
-        <div class="dash-stat-num" id="hero-next-days" style="color:var(--accent);">—</div>
-        <div style="font-size:10px;color:var(--muted2);margin-top:3px;" id="hero-next-label"></div>
+    </div><!-- /left -->
+
+    <!-- RIGHT: Calendar + Timeline -->
+    <div class="db-right">
+      <div class="card" style="margin:0;padding:16px;">
+        <div id="cal-wrap"></div>
+      </div>
+      <div class="card" style="margin:0;padding:16px;flex:1;">
+        <div style="font-size:13px;font-weight:700;margin-bottom:2px;" id="tl-title">Heute</div>
+        <div style="font-size:11px;color:var(--muted2);margin-bottom:14px;">Heutiger Plan</div>
+        <div id="tl-list"></div>
       </div>
     </div>
-  </div>
 
-  <!-- Heute -->
-  <div id="today-section" style="display:none;">
-    <div class="sec-label">Heute</div>
-    <div id="today-events" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:4px;"></div>
-  </div>
-
-  <!-- Nächste Termine -->
-  <div class="sec-label">Nächste Termine</div>
-  <div class="card" style="padding:0;overflow:hidden;margin-bottom:16px;" id="upcoming-list"></div>
-
-  <!-- Prüfungen -->
-  <div id="exams-section" style="display:none;">
-    <div class="sec-label">Prüfungen</div>
-    <div class="grid2" style="margin-bottom:16px;" id="exams-grid"></div>
-  </div>
-
-  <!-- Habits -->
-  <div class="sec-label">Heute — Habits</div>
-  <div class="card" style="padding:4px 14px;margin-bottom:16px;" id="habits-list"></div>
-
-  <!-- Schnellzugriff -->
-  <div class="sec-label">Schnellzugriff</div>
-  <div class="dash-grid">
-    <a href="/dashboard/uni" class="quick-card" style="border-color:#a78bfa22">
-      <div class="quick-card-icon">◐</div>
-      <div class="quick-card-title" style="color:#a78bfa;">Lernplan</div>
-      <div class="quick-card-sub">Phasen · Methoden · Termine</div>
-    </a>
-    <a href="/dashboard/sport" class="quick-card" style="border-color:#4ade8022">
-      <div class="quick-card-icon">▣</div>
-      <div class="quick-card-title" style="color:#4ade80;">Sport</div>
-      <div class="quick-card-sub">Gym · Boxen · Laufen</div>
-    </a>
-    <a href="/dashboard/projekte" class="quick-card" style="border-color:#f9731622">
-      <div class="quick-card-icon">🚀</div>
-      <div class="quick-card-title" style="color:#f97316;">BEARS</div>
-      <div class="quick-card-sub">Avionics · Propulsion</div>
-    </a>
-    <a href="/dashboard/timetable" class="quick-card" style="border-color:#60a5fa22">
-      <div class="quick-card-icon">▦</div>
-      <div class="quick-card-title" style="color:#60a5fa;">Wochenplan</div>
-      <div class="quick-card-sub">Aktuelle Woche</div>
-    </a>
-  </div>
-
+  </div><!-- /main grid -->
 </div>
 
+<style>
+/* Layout */
+.db-layout { display:grid; grid-template-columns:1fr 240px; gap:14px; align-items:start; }
+.db-left   { display:flex; flex-direction:column; gap:10px; }
+.db-right  { display:flex; flex-direction:column; gap:10px; }
+
+/* Stat grid */
+.db-stat-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+
+/* Stat card */
+.dbc {
+  background: rgba(var(--c1), 0.06);
+  border: 1px solid rgba(var(--c1), 0.22);
+  padding: 16px 18px;
+  position: relative;
+  overflow: hidden;
+  min-height: 130px;
+}
+.dbc-label    { font-size:10px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:rgba(var(--c1),0.8); margin-bottom:2px; }
+.dbc-big      { font-size:38px; font-weight:800; color:rgba(var(--c1),1); line-height:1; font-family:var(--body); }
+.dbc-unit     { font-size:13px; color:var(--muted2); }
+.dbc-name     { font-size:12px; font-weight:600; color:var(--text); }
+.dbc-sec      { font-size:18px; font-weight:700; color:rgba(var(--c1),0.85); line-height:1; font-family:var(--body); }
+.dbc-sec-lbl  { font-size:9px; color:var(--muted2); margin-top:2px; }
+.dbc-deco     { position:absolute; right:14px; top:14px; font-size:26px; opacity:0.12; }
+
+/* Bottom row */
+.db-bottom { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+
+/* Calendar */
+.cal-nav  { display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; }
+.cal-nav button { background:none; border:none; color:var(--muted2); cursor:pointer; font-size:18px; padding:0 4px; line-height:1; transition:color 0.12s; }
+.cal-nav button:hover { color:var(--text); }
+.cal-nav span { font-size:13px; font-weight:700; }
+.cal-g    { display:grid; grid-template-columns:repeat(7,1fr); gap:2px; }
+.cal-hdr  { font-size:9px; color:var(--muted); text-align:center; padding:2px 0 5px; font-weight:600; }
+.cal-cell { font-size:11px; text-align:center; padding:4px 2px; color:var(--muted2); border-radius:3px; cursor:default; position:relative; line-height:1.5; }
+.cal-cell.today { background:var(--neon); color:#000; font-weight:900; border-radius:50%; }
+.cal-cell.has-dl::after { content:''; position:absolute; bottom:1px; left:50%; transform:translateX(-50%); width:4px; height:4px; border-radius:50%; background:var(--pink); }
+.cal-cell.today.has-dl::after { background:#000; }
+.cal-cell.dim { opacity:0.25; }
+
+/* Timeline */
+.tl-row   { display:flex; gap:10px; margin-bottom:12px; }
+.tl-row:last-child { margin-bottom:0; }
+.tl-t     { font-family:var(--mono); font-size:10px; color:var(--muted2); flex-shrink:0; width:36px; padding-top:2px; }
+.tl-conn  { display:flex; flex-direction:column; align-items:center; flex-shrink:0; }
+.tl-dot   { width:9px; height:9px; border-radius:50%; border:2px solid; flex-shrink:0; }
+.tl-vl    { flex:1; width:1px; background:var(--border2); margin-top:3px; min-height:20px; }
+.tl-info  { flex:1; padding-top:1px; }
+.tl-name  { font-size:12px; font-weight:600; }
+.tl-sub   { font-size:10px; color:var(--muted2); margin-top:2px; }
+
+/* Habits mini */
+.hm-row { display:flex; align-items:center; gap:9px; padding:6px 0; border-bottom:1px solid var(--border); cursor:pointer; }
+.hm-row:last-child { border-bottom:none; }
+.hm-box { width:15px; height:15px; border:1px solid var(--border2); border-radius:3px; display:grid; place-items:center; font-size:9px; flex-shrink:0; transition:all 0.15s; }
+.hm-label { font-size:12px; flex:1; }
+.hm-row.done .hm-label { text-decoration:line-through; color:var(--muted); }
+
+@media (max-width:1100px) {
+  .db-layout { grid-template-columns:1fr; }
+  .db-right  { flex-direction:row; flex-wrap:wrap; }
+  .db-right .card { flex:1; min-width:200px; }
+}
+@media (max-width:640px) {
+  .db-stat-grid, .db-bottom { grid-template-columns:1fr; }
+}
+</style>
+
 <script>
-const EXAMS = [
-  { sub:"Mechanik 2", label:"KFT",         date:"2026-06-05", time:"13:00", col:"#f97316" },
-  { sub:"KL1",        label:"HA3",          date:"2026-06-07", time:"22:45", col:"#60a5fa" },
-  { sub:"DGL",        label:"Zwischentest", date:"2026-06-12", time:"22:00", col:"#a78bfa" },
-  { sub:"KL1",        label:"HA4",          date:"2026-06-21", time:"22:45", col:"#60a5fa" },
-  { sub:"ITP",        label:"Abgabe dts",   date:"2026-07-03", time:"16:00", col:"#22d3ee" },
-  { sub:"KL1",        label:"HA5",          date:"2026-07-05", time:"22:45", col:"#60a5fa" },
-  { sub:"ITP",        label:"Test",         date:"2026-07-14", time:"16:00", col:"#22d3ee" },
-  { sub:"DGL",        label:"Prüfung",      date:"2026-07-21", time:"13:30", col:"#a78bfa" },
-  { sub:"Ana2",       label:"Prüfung",      date:"2026-07-23", time:"15:00", col:"#4ade80" },
-  { sub:"KL1",        label:"Test",         date:"2026-08-03", time:"12:00", col:"#60a5fa" },
-];
-const WEEK_EVENTS = {
-  Mo:[{label:"🏃 Easy Run",col:"#60a5fa",href:"/dashboard/sport"},{label:"🥊 Boxen 18:00",col:"#8888ff",href:"/dashboard/sport"}],
-  Di:[{label:"Uni",col:"#a78bfa",href:"/dashboard/uni"},{label:"🚀 BEARS 16–21",col:"#f97316",href:"/dashboard/projekte"}],
-  Mi:[{label:"🏋️ GYM A",col:"#4ade80",href:"/dashboard/sport"},{label:"🥊 Boxen 18:00",col:"#8888ff",href:"/dashboard/sport"}],
-  Do:[{label:"🏃 Intervalle",col:"#60a5fa",href:"/dashboard/sport"},{label:"🚀 BEARS 16–22",col:"#f97316",href:"/dashboard/projekte"}],
-  Fr:[{label:"🏋️ GYM B",col:"#f97316",href:"/dashboard/sport"}],
-  Sa:[{label:"Bäcker 7–11",col:"#f59e0b",href:"#"},{label:"🏃 Long Run",col:"#22d3ee",href:"/dashboard/sport"}],
-  So:[{label:"Ruhetag 💤",col:"#28283a",href:"#"}],
-};
-const DAYS_DE = ["So","Mo","Di","Mi","Do","Fr","Sa"];
+const DAYS_DE   = ['So','Mo','Di','Mi','Do','Fr','Sa'];
+const DAYS_FULL = ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'];
+const MONTHS    = ['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
 const PHASES = [
-  {title:"Sofort-Modus",     from:"2026-05-27",to:"2026-06-05",col:"#ef4444",focus:"Mechanik 2"},
-  {title:"DGL Zwischentest", from:"2026-06-06",to:"2026-06-12",col:"#f59e0b",focus:"DGL"},
-  {title:"Breite Basis",     from:"2026-06-13",to:"2026-07-13",col:"#4ade80",focus:"Alle Fächer"},
-  {title:"Prüfungsmarathon", from:"2026-07-14",to:"2026-07-23",col:"#f97316",focus:"ITP → DGL → Ana2"},
-  {title:"KL1 Endspurt",     from:"2026-07-24",to:"2026-08-03",col:"#60a5fa",focus:"KL1"},
+  {title:'Sofort-Modus',     from:'2026-05-27',to:'2026-06-05',col:'#ef4444',focus:'Mechanik 2'},
+  {title:'DGL Zwischentest', from:'2026-06-06',to:'2026-06-12',col:'#f59e0b',focus:'DGL'},
+  {title:'Breite Basis',     from:'2026-06-13',to:'2026-07-13',col:'#4ade80',focus:'Alle Fächer'},
+  {title:'Prüfungsmarathon', from:'2026-07-14',to:'2026-07-23',col:'#f97316',focus:'ITP → DGL → Ana2'},
+  {title:'KL1 Endspurt',     from:'2026-07-24',to:'2026-08-03',col:'#60a5fa',focus:'KL1'},
 ];
-const QUOTES = [
-  "Jede 25-Minuten-Session bringt dich näher ans Ziel.",
-  "Active Recall schlägt Lesen. Teste dich selbst.",
-  "Interleaving: Wechsle heute zwischen zwei Fächern.",
-  "Kurze Session > Keine Session.",
-  "Schlaf ist kein Feind — er festigt das Gelernte.",
-  "Spaced Repetition: Heute wiederholen, was du vor 3 Tagen gelernt hast.",
-];
+const TODAY_EVS = {
+  Mo:[{l:'🏃 Easy Run',c:'#22d3ee',h:6.5,e:7.5},{l:'🥊 Boxen',c:'#ef4444',h:18,e:19.5}],
+  Di:[{l:'📚 Uni',c:'#a78bfa',h:8,e:12},{l:'🚀 BEARS 16–21',c:'#f97316',h:16,e:21}],
+  Mi:[{l:'🏋️ GYM A',c:'#4ade80',h:7,e:8.5},{l:'🥊 Boxen',c:'#ef4444',h:18,e:19.5}],
+  Do:[{l:'🏃 Intervalle',c:'#22d3ee',h:6.5,e:7},{l:'📚 Uni',c:'#a78bfa',h:8,e:12},{l:'🚀 BEARS',c:'#f97316',h:16,e:22}],
+  Fr:[{l:'🏋️ GYM B',c:'#4ade80',h:7,e:9},{l:'📖 Lernen',c:'#a78bfa',h:10,e:13}],
+  Sa:[{l:'🥐 Bäcker 7–11',c:'#f59e0b',h:7,e:11},{l:'🏃 Long Run',c:'#22d3ee',h:12,e:13}],
+  So:[{l:'💤 Ruhetag',c:'#52526a',h:10,e:22}],
+};
 const HABITS = [
-  {id:"h-es",    label:"🇪🇸 Spanisch 30 min",         col:"#f97316"},
-  {id:"h-ru",    label:"🇷🇺 Russisch 30 min",          col:"#60a5fa"},
-  {id:"h-pom",   label:"🍅 Lerneinheit (1+ Pomodoro)", col:"#ffffff"},
-  {id:"h-sport", label:"🏋️ Sport / Gym",               col:"#4ade80"},
-  {id:"h-sleep", label:"😴 Vor 23:00 schlafen",        col:"#a78bfa"},
+  {id:'h-es',  l:'🇪🇸 Spanisch 30 min', c:'#f97316'},
+  {id:'h-ru',  l:'🇷🇺 Russisch 30 min',  c:'#60a5fa'},
+  {id:'h-pom', l:'🍅 Pomodoro (1+)',     c:'#ff2d78'},
+  {id:'h-gym', l:'🏋️ Sport / Gym',        c:'#4ade80'},
+  {id:'h-slp', l:'😴 Vor 23:00 schlafen', c:'#a855f7'},
+  {id:'h-h2o', l:'💧 2L Wasser',          c:'#22d3ee'},
 ];
+const TYPE_L = {pruefung:'Prüfung',ha:'HA',abgabe:'Abgabe',projekt:'Projekt',klausur:'Klausur',sonstiges:'—'};
+const SUB_C  = {'Mechanik 2':'#f97316','KL1':'#60a5fa','DGL':'#a78bfa','Ana2':'#4ade80','ITP':'#22d3ee','BEARS':'#f59e0b','Sonstiges':'#8888aa'};
 
-function daysUntil(s){ return Math.ceil((new Date(s)-new Date())/86400000); }
+const now  = new Date();
+const nowH = now.getHours() + now.getMinutes()/60;
+const dk   = DAYS_DE[now.getDay()];
 
-(function initDashboard(){
-  const now = new Date();
-  const dayKey = DAYS_DE[now.getDay()];
+function du(s){ return Math.ceil((new Date(s)-now)/86400000); }
+function fd(s){ const d=new Date(s); return String(d.getDate()).padStart(2,'0')+'.'+String(d.getMonth()+1).padStart(2,'0')+'.'; }
+function fh(h){ return String(Math.floor(h)).padStart(2,'0')+':'+String(Math.round((h%1)*60)).padStart(2,'0'); }
+function set(id,v){ const e=document.getElementById(id); if(e) e.textContent=v; }
 
-  // Hero: phase
-  const phase = PHASES.find(p=>now>=new Date(p.from)&&now<=new Date(p.to))||PHASES[0];
-  document.getElementById('hero-day').textContent = dayKey + ' · SoSe 2026';
-  document.getElementById('hero-phase').textContent = phase.title;
-  document.getElementById('hero-focus').textContent = 'Fokus: ' + phase.focus;
-  document.getElementById('hero-focus').style.color = phase.col;
-  document.getElementById('hero-quote').textContent = '"' + QUOTES[now.getHours() % QUOTES.length] + '"';
+/* ── Greeting & phase ───────────────────────────────────────── */
+const gh = nowH<12?'Guten Morgen':nowH<18?'Guten Tag':'Guten Abend';
+set('dash-greeting', gh+'!');
+const phase = PHASES.find(p=>now>=new Date(p.from)&&now<=new Date(p.to))||PHASES[PHASES.length-1];
+document.getElementById('dash-sub').innerHTML =
+  `<span style="color:${phase.col};font-weight:700;">${phase.title}</span> · Fokus: ${phase.focus} · ${DAYS_FULL[now.getDay()]}`;
+set('today-date', now.toLocaleDateString('de-DE',{day:'numeric',month:'long',year:'numeric'}));
+set('tl-title', DAYS_FULL[now.getDay()]+' · Heute');
 
-  // Upcoming exams
-  const upcoming = EXAMS.map(e=>({...e,days:daysUntil(e.date)}))
-    .filter(e=>e.days>=0).sort((a,b)=>a.days-b.days).slice(0,5);
+/* ── Deadlines ──────────────────────────────────────────────── */
+let dlAll=[];
+try{ dlAll=JSON.parse(localStorage.getItem('uni-dl-v3')||'[]'); }catch{}
+const upcoming=dlAll.filter(d=>!d.done&&du(d.date)>=0).sort((a,b)=>new Date(a.date)-new Date(b.date));
+const thisWk=upcoming.filter(d=>du(d.date)<=7);
 
-  if(upcoming.length){
-    const nx = upcoming[0];
-    document.getElementById('hero-next-days').textContent = nx.days+'d';
-    document.getElementById('hero-next-days').style.color = nx.days<=7?'#ef4444':nx.col;
-    document.getElementById('hero-next-label').textContent = nx.sub+' '+nx.label;
-  } else {
-    document.getElementById('hero-next-wrap').style.display='none';
-  }
+if(upcoming.length){
+  const nx=upcoming[0], d=du(nx.date);
+  set('dc-days', d===0?'0':d+'');
+  set('dc-week', thisWk.length+'');
+  set('dc-open', upcoming.length+'');
+  set('dc-name', nx.subject+' · '+nx.label);
+} else {
+  set('dc-days','✓'); set('dc-week','0'); set('dc-open','0'); set('dc-name','Alle erledigt!');
+}
 
-  const upList = document.getElementById('upcoming-list');
-  upcoming.forEach(e=>{
-    const row = document.createElement('div');
-    row.style.cssText='display:flex;align-items:center;gap:10px;padding:9px 14px;border-bottom:1px solid var(--border);';
-    row.innerHTML = `<div style="width:6px;height:6px;border-radius:50%;background:${e.col};flex-shrink:0;"></div>
-      <div style="flex:1;font-size:11px;"><span style="color:${e.col};font-weight:700;">${e.sub}</span><span style="color:var(--muted2);margin-left:6px;">${e.label}</span></div>
-      <div style="text-align:right;">
-        <span style="font-size:11px;font-weight:700;color:${e.days<=7?'#ef4444':'var(--muted2)'};">${e.days===0?'Heute!':'in '+e.days+'d'}</span>
-        <div style="font-size:9px;color:var(--muted2);">${e.time}</div>
-      </div>`;
-    upList.appendChild(row);
+const upEl=document.getElementById('upcoming-list');
+if(!upcoming.length){
+  upEl.innerHTML='<div style="padding:16px;font-size:13px;color:var(--muted);text-align:center;">Keine offenen Deadlines ✓</div>';
+} else {
+  upcoming.slice(0,7).forEach(e=>{
+    const d=du(e.date), c=SUB_C[e.subject]||'#8888aa';
+    const dc=d===0?'#ef4444':d<=3?'#f97316':d<=7?'#f59e0b':'var(--muted2)';
+    const dt=d===0?'HEUTE':d===1?'morgen':'in '+d+'d';
+    upEl.innerHTML+=`<a href="/dashboard/uni" style="text-decoration:none;display:block;" onmouseover="this.querySelector('div').style.background='rgba(255,255,255,0.025)'" onmouseout="this.querySelector('div').style.background=''">
+      <div style="display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid var(--border);transition:background 0.1s;">
+        <div style="width:6px;height:6px;border-radius:50%;background:${c};flex-shrink:0;margin-top:1px;"></div>
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:13px;font-weight:500;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"><span style="color:${c};font-weight:700;">${e.subject}</span> — ${e.label}</div>
+          <div style="font-size:10px;color:var(--muted2);margin-top:2px;">${fd(e.date)} ${e.time||''} · ${TYPE_L[e.type]||e.type}</div>
+        </div>
+        <div style="font-size:11px;font-weight:700;color:${dc};flex-shrink:0;font-family:var(--display);">${dt}</div>
+      </div></a>`;
   });
+}
 
-  // Final exams grid
-  const finals = upcoming.filter(e=>['Prüfung','Test'].includes(e.label));
-  if(finals.length){
-    document.getElementById('exams-section').style.display='block';
-    const grid = document.getElementById('exams-grid');
-    finals.forEach(e=>{
-      const d = e.date.split('-').reverse().slice(0,2).join('.');
-      grid.innerHTML += `<a href="/dashboard/uni" style="text-decoration:none;">
-        <div class="card" style="border-color:${e.col}33;cursor:pointer;">
-          <div style="font-family:var(--display);font-size:15px;font-style:italic;font-weight:700;margin-bottom:4px;color:var(--accent);">${e.sub}</div>
-          <div style="font-size:9px;color:var(--muted2);margin-bottom:8px;">${d}</div>
-          <div style="font-size:22px;font-weight:700;color:${e.days<=21?'#ef4444':e.col};font-family:var(--mono);">${e.days}d</div>
-        </div></a>`;
-    });
+/* ── Habits ─────────────────────────────────────────────────── */
+const hk='habits-'+now.toDateString();
+let hs={};
+try{ hs=JSON.parse(localStorage.getItem(hk)||'{}'); }catch{}
+
+function renderHabits(){
+  const done=Object.values(hs).filter(Boolean).length;
+  const pct=Math.round(done/HABITS.length*100);
+  set('dc-hdone', done+'');
+  set('dc-hpct-label', done===HABITS.length?'Alle erledigt! 🎉':done===0?'Noch nicht gestartet':pct+'% erledigt');
+  document.getElementById('dc-habit-bar').style.width=pct+'%';
+
+  const mini=document.getElementById('habits-mini');
+  mini.innerHTML='';
+  HABITS.forEach(h=>{
+    const d=!!hs[h.id];
+    const row=document.createElement('div');
+    row.className='hm-row'+(d?' done':'');
+    row.innerHTML=`<div class="hm-box" style="border-color:${d?h.c:'var(--border2)'};background:${d?h.c:'transparent'};color:#000;">${d?'✓':''}</div>
+      <span class="hm-label">${h.l}</span>
+      ${d?`<span style="font-size:10px;color:${h.c};">✓</span>`:''}`;
+    row.onclick=()=>{
+      hs[h.id]=!hs[h.id];
+      try{localStorage.setItem(hk,JSON.stringify(hs));}catch{}
+      if(hs[h.id]&&window.earnXP) window.earnXP(15,'wis','Habit: '+h.l);
+      renderHabits();
+    };
+    mini.appendChild(row);
+  });
+}
+renderHabits();
+
+/* ── Pomodoro stat ──────────────────────────────────────────── */
+function refreshPom(){
+  const p=window.pomSessions||0;
+  set('dc-pom', p+'');
+  set('dc-min', (p*25)+'');
+  document.getElementById('dc-pom-bar').style.width=Math.min(100,p/4*100)+'%';
+}
+refreshPom();
+setInterval(refreshPom, 3000);
+
+/* ── XP stat ────────────────────────────────────────────────── */
+function refreshXP(){
+  try{
+    const g=JSON.parse(localStorage.getItem('g-state')||'{}');
+    const xp=g.xp||0;
+    const lvl=Math.max(1,Math.floor((1+Math.sqrt(1+8*xp/50))/2));
+    const tl=lvl*(lvl-1)*50, nl=lvl*(lvl+1)*50;
+    const pct=nl>tl?Math.round((xp-tl)/(nl-tl)*100):0;
+    set('dc-level', lvl+'');
+    set('dc-xp', xp+'');
+    set('dc-streak', localStorage.getItem('streak')||'0');
+    document.getElementById('dc-xp-bar').style.width=pct+'%';
+  }catch{}
+}
+refreshXP();
+setInterval(refreshXP, 5000);
+
+/* ── Today events ───────────────────────────────────────────── */
+const evWrap=document.getElementById('today-events');
+const tevs=(TODAY_EVS[dk]||[]).slice().sort((a,b)=>a.h-b.h);
+if(tevs.length){
+  tevs.forEach(ev=>{
+    const isNow=nowH>=ev.h&&nowH<ev.e;
+    evWrap.innerHTML+=`<span style="display:inline-block;padding:5px 12px;border:1px solid ${ev.c}${isNow?'':'66'};background:${ev.c}${isNow?'22':'0d'};color:${ev.c};font-size:12px;font-weight:600;border-radius:2px;">${ev.l}${isNow?' ◉':''}</span>`;
+  });
+} else {
+  evWrap.innerHTML='<span style="font-size:12px;color:var(--muted);">Keine Events heute</span>';
+}
+
+/* ── Timeline ───────────────────────────────────────────────── */
+const tlEl=document.getElementById('tl-list');
+if(!tevs.length){
+  tlEl.innerHTML='<div style="font-size:12px;color:var(--muted);">Keine Events</div>';
+} else {
+  tevs.forEach((ev,i)=>{
+    const past=nowH>ev.e, isNow=nowH>=ev.h&&nowH<ev.e, last=i===tevs.length-1;
+    tlEl.innerHTML+=`<div class="tl-row">
+      <div class="tl-t">${fh(ev.h)}</div>
+      <div class="tl-conn">
+        <div class="tl-dot" style="border-color:${ev.c};background:${isNow?ev.c:'transparent'};"></div>
+        ${!last?'<div class="tl-vl"></div>':''}
+      </div>
+      <div class="tl-info" style="opacity:${past?0.45:1};">
+        <div class="tl-name" style="color:${isNow?ev.c:'var(--text)'};">${ev.l}</div>
+        <div class="tl-sub">${fh(ev.h)} – ${fh(ev.e)}${isNow?' · <span style="color:var(--neon);font-weight:700;">jetzt</span>':''}</div>
+      </div>
+    </div>`;
+  });
+}
+
+/* ── Calendar ───────────────────────────────────────────────── */
+const dlDates=new Set(dlAll.filter(d=>!d.done).map(d=>d.date));
+let cy=now.getFullYear(), cm=now.getMonth();
+function buildCal(){
+  const fd2=(new Date(cy,cm,1).getDay()+6)%7;
+  const days=new Date(cy,cm+1,0).getDate();
+  let h=`<div class="cal-nav">
+    <button onclick="cm--;if(cm<0){cm=11;cy--;}buildCal()">‹</button>
+    <span>${MONTHS[cm]} ${cy}</span>
+    <button onclick="cm++;if(cm>11){cm=0;cy++;}buildCal()">›</button>
+  </div>
+  <div class="cal-g">
+    ${['Mo','Di','Mi','Do','Fr','Sa','So'].map(d=>`<div class="cal-hdr">${d}</div>`).join('')}
+    ${Array(fd2).fill('<div class="cal-cell dim"></div>').join('')}`;
+  for(let d=1;d<=days;d++){
+    const isT=d===now.getDate()&&cm===now.getMonth()&&cy===now.getFullYear();
+    const ds=`${cy}-${String(cm+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    h+=`<div class="cal-cell${isT?' today':''}${dlDates.has(ds)?' has-dl':''}">${d}</div>`;
   }
+  h+='</div>';
+  document.getElementById('cal-wrap').innerHTML=h;
+}
+buildCal();
 
-  // Today events
-  const todayEvs = WEEK_EVENTS[dayKey]||[];
-  if(todayEvs.length){
-    document.getElementById('today-section').style.display='block';
-    const wrap = document.getElementById('today-events');
-    todayEvs.forEach(ev=>{
-      wrap.innerHTML += `<a href="${ev.href}" style="padding:6px 12px;border-radius:3px;border:1px solid ${ev.col}44;background:${ev.col}0d;color:${ev.col};font-size:11px;font-weight:700;text-decoration:none;font-family:var(--sans);letter-spacing:0.5px;">${ev.label}</a>`;
-    });
-  }
-
-  // Habits
-  const habitsKey = 'habits-'+now.toDateString();
-  let habitsState = {};
-  try{ habitsState = JSON.parse(localStorage.getItem(habitsKey)||'{}'); }catch{}
-  const habitsList = document.getElementById('habits-list');
-  function renderHabits(){
-    habitsList.innerHTML='';
-    HABITS.forEach(h=>{
-      const done=!!habitsState[h.id];
-      const row=document.createElement('div');
-      row.className='habit-row'+(done?' done':'');
-      row.innerHTML=`<div class="checkbox" style="border-color:${done?h.col:'var(--border2)'};background:${done?h.col:'transparent'};">${done?'✓':''}</div>
-        <span class="habit-label" style="text-decoration:${done?'line-through':'none'};">${h.label}</span>
-        ${done?`<span class="habit-badge" style="color:${h.col};border-color:${h.col}44;">✓</span>`:''}`;
-      row.onclick=()=>{
-        habitsState[h.id]=!habitsState[h.id];
-        try{localStorage.setItem(habitsKey,JSON.stringify(habitsState));}catch{}
-        renderHabits();
-      };
-      habitsList.appendChild(row);
-    });
-    const done=Object.values(habitsState).filter(Boolean).length;
-    habitsList.insertAdjacentHTML('beforeend',`<div style="font-size:9px;color:var(--muted2);text-align:right;padding:6px 0 2px;">${done}/${HABITS.length} heute</div>`);
-  }
-  renderHabits();
-
-})();
+/* ── Quick capture ──────────────────────────────────────────── */
+function lc(){try{return JSON.parse(localStorage.getItem('quick-captures')||'[]');}catch{return[];}}
+function sc(a){try{localStorage.setItem('quick-captures',JSON.stringify(a));}catch{}}
+function addCap(){
+  const i=document.getElementById('cap-in'),v=i.value.trim();if(!v)return;
+  const a=lc();a.unshift({id:'c'+Date.now(),text:v,done:false});sc(a);i.value='';rc();
+}
+function rc(){
+  const items=lc().slice(0,6);
+  const el=document.getElementById('cap-list');
+  if(!items.length){el.innerHTML='';return;}
+  el.innerHTML=items.map(c=>`
+    <div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--border);">
+      <div onclick="tc('${c.id}')" style="width:15px;height:15px;border:1px solid ${c.done?'var(--neon)':'var(--border2)'};background:${c.done?'var(--neon)':'transparent'};border-radius:3px;display:grid;place-items:center;cursor:pointer;flex-shrink:0;font-size:9px;color:#000;transition:all 0.12s;">${c.done?'✓':''}</div>
+      <span style="flex:1;font-size:12px;${c.done?'text-decoration:line-through;color:var(--muted);':''}">${c.text}</span>
+      <button onclick="dc2('${c.id}')" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:13px;padding:0 3px;transition:color 0.12s;" onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='var(--muted)'">✕</button>
+    </div>`).join('');
+}
+function tc(id){const a=lc(),i=a.findIndex(c=>c.id===id);if(i>=0){a[i].done=!a[i].done;sc(a);rc();}}
+function dc2(id){sc(lc().filter(c=>c.id!==id));rc();}
+rc();
 </script>
 {% endblock %}

@@ -4,129 +4,349 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Life OS</title>
+  <link rel="manifest" href="/static/manifest.json">
+  <meta name="theme-color" content="#050507">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Life OS">
+  <link rel="apple-touch-icon" href="/static/icon-192.png">
+  <link rel="icon" type="image/png" href="/static/icon-192.png">
   <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
 
-<div id="banner">
-  <canvas id="pixel-canvas"></canvas>
-  <div id="banner-fade"></div>
-  <div id="banner-title">
-    <a href="/dashboard" style="text-decoration:none;display:flex;align-items:baseline;gap:10px;">
-      <div class="banner-icon">OS</div>
-      <div class="banner-name">Life OS<span>Uni · Sport · Leben</span></div>
-    </a>
-  </div>
-  <div id="notif-bar-inline" style="position:absolute;top:8px;right:16px;display:none;align-items:center;gap:8px;">
-    <span style="font-size:10px;color:var(--muted2);">Erinnerungen aktivieren?</span>
-    <button onclick="requestNotif()" style="padding:4px 10px;background:var(--accent);color:#000;border:none;border-radius:2px;font-family:var(--mono);font-size:10px;cursor:pointer;">Ja</button>
-    <button onclick="document.getElementById('notif-bar-inline').style.display='none'" style="padding:4px 10px;background:transparent;border:1px solid var(--border2);color:var(--muted2);border-radius:2px;font-family:var(--mono);font-size:10px;cursor:pointer;">Nein</button>
-  </div>
-</div>
+<div id="shell">
 
-<div id="app">
+  <!-- ── Sidebar (desktop + tablet icon) ── -->
   <nav id="sidebar">
-    <div class="sidebar-section-label">Menu</div>
-    <a href="/dashboard"  class="nav-item {% if active=='dashboard' %}active{% endif %}">Dashboard</a>
-    <a href="/dashboard/uni"       class="nav-item {% if active=='uni' %}active{% endif %}">Uni</a>
-    <a href="/dashboard/sport"     class="nav-item {% if active=='sport' %}active{% endif %}">Sport</a>
-    <a href="/dashboard/projekte"  class="nav-item {% if active=='projekte' %}active{% endif %}">Projekte</a>
-    <a href="/dashboard/sprachen"  class="nav-item {% if active=='sprachen' %}active{% endif %}">Sprachen</a>
-    <a href="/dashboard/timetable" class="nav-item {% if active=='timetable' %}active{% endif %}">Wochenplan</a>
+    <div class="sidebar-logo">
+      <canvas id="pixel-canvas"></canvas>
+      <div class="sidebar-logo-inner">
+        <div class="logo-tag">Life OS</div>
+        <div class="logo-title">DASHBOARD</div>
+        <div class="logo-sub">Uni · Sport · Projekte</div>
+      </div>
+    </div>
 
+    <div id="notif-bar-inline" class="notif-bar" style="display:none;">
+      <span style="flex:1;">Erinnerungen?</span>
+      <button onclick="requestNotif()">Ja</button>
+      <button class="notif-dismiss" onclick="this.parentElement.style.display='none'">✕</button>
+    </div>
+
+    <div class="nav-links">
+      <a href="/dashboard"           class="nav-item {% if active=='dashboard' %}active{% endif %}">
+        <span class="nav-icon">⬡</span><span class="nav-label">Dashboard</span></a>
+      <a href="/dashboard/uni"       class="nav-item {% if active=='uni' %}active{% endif %}">
+        <span class="nav-icon">◈</span><span class="nav-label">Uni</span></a>
+      <a href="/dashboard/sport"     class="nav-item {% if active=='sport' %}active{% endif %}">
+        <span class="nav-icon">◉</span><span class="nav-label">Sport</span></a>
+      <a href="/dashboard/projekte"  class="nav-item {% if active=='projekte' %}active{% endif %}">
+        <span class="nav-icon">◈</span><span class="nav-label">Projekte</span></a>
+      <a href="/dashboard/sprachen"  class="nav-item {% if active=='sprachen' %}active{% endif %}">
+        <span class="nav-icon">◎</span><span class="nav-label">Sprachen</span></a>
+      <a href="/dashboard/timetable" class="nav-item {% if active=='timetable' %}active{% endif %}">
+        <span class="nav-icon">▦</span><span class="nav-label">Wochenplan</span></a>
+    </div>
+
+    <div class="sidebar-scroll">
+      <!-- Pomodoro -->
+      <div id="pom-section">
+        <div id="pom-idle">
+          <button class="pom-idle-btn" onclick="pomShowPicker()">▶ Pomodoro starten</button>
+          <div style="font-size:7px;color:var(--muted);text-align:center;margin-top:5px;letter-spacing:1px;">P — Shortcut</div>
+        </div>
+        <div id="pom-picker" style="display:none;">
+          <div style="font-size:7px;color:var(--muted2);letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;">Fach wählen</div>
+          <div class="pom-subject-picker" id="pom-subjects"></div>
+          <div class="pom-controls" style="margin-top:8px;">
+            <button class="pom-btn" onclick="pomStart()" style="color:var(--neon);border-color:var(--neon);">▶ 25 min</button>
+            <button class="pom-btn" onclick="document.getElementById('pom-picker').style.display='none';document.getElementById('pom-idle').style.display='';">✕</button>
+          </div>
+        </div>
+        <div id="pom-running" style="display:none;" class="pom-running">
+          <div class="pom-time" id="pom-display">25:00</div>
+          <div class="pom-subject-label" id="pom-label">KL1 · #1</div>
+          <div class="pom-progress"><div class="pom-progress-fill" id="pom-bar" style="width:0%"></div></div>
+          <div class="pom-controls" id="pom-ctrl-work">
+            <button class="pom-btn" id="pom-pause-btn" onclick="pomPause()">⏸</button>
+            <button class="pom-btn stop" onclick="pomStop()">■</button>
+            <button class="pom-btn" onclick="pomFocus()" title="F — Fokus" style="font-size:10px;">⛶</button>
+          </div>
+          <div class="pom-controls" id="pom-ctrl-break" style="display:none;">
+            <button class="pom-btn" onclick="pomSkipBreak()">Skip ▶</button>
+          </div>
+          <div id="pom-dots" style="display:flex;gap:3px;justify-content:center;margin-top:5px;"></div>
+        </div>
+      </div>
+
+      <!-- Clock -->
+      <div id="sidebar-clock">
+        <div id="clock-time">--:--</div>
+        <div id="clock-date">— —</div>
+        <div class="mini-progress">
+          <div class="mp-row">
+            <div class="mp-bar-wrap"><div class="mp-bar" id="bar-year"  style="width:0%"></div></div>
+            <span class="mp-label">Jahr <span id="pct-year">0</span>%</span>
+          </div>
+          <div class="mp-row">
+            <div class="mp-bar-wrap"><div class="mp-bar" id="bar-month" style="width:0%"></div></div>
+            <span class="mp-label">Monat <span id="pct-month">0</span>%</span>
+          </div>
+          <div class="mp-row">
+            <div class="mp-bar-wrap"><div class="mp-bar" id="bar-week"  style="width:0%"></div></div>
+            <span class="mp-label">Woche <span id="pct-week">0</span>%</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Streak -->
+      <div class="streak-badge" id="streak-section" style="display:none;">
+        <div class="streak-label">Streak</div>
+        <div style="display:flex;align-items:baseline;gap:5px;">
+          <span class="streak-num" id="streak-num">1</span>
+          <span class="streak-sub" id="streak-sub">Tag</span>
+        </div>
+        <div id="streak-log" style="margin-top:7px;border-top:1px solid var(--border);padding-top:6px;display:none;"></div>
+      </div>
+
+      <!-- Remind -->
+      <div class="sidebar-remind-btn" style="display:flex;flex-direction:column;gap:5px;">
+        <button onclick="showReminder(true)">⏰ Erinnerung</button>
+        <button onclick="showMotivBubble()" style="background:rgba(168,85,247,0.12);border-color:rgba(168,85,247,0.3);color:#a855f7;">💬 Motivation</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ── Main Wrap ── -->
+  <div id="main-wrap">
+
+    <!-- Topbar (tablet/mobile) -->
+    <div id="topbar">
+      <button id="hamburger-btn" onclick="toggleDrawer()" aria-label="Menü">
+        <div class="ham-line"></div>
+        <div class="ham-line"></div>
+        <div class="ham-line"></div>
+      </button>
+      <div class="topbar-logo">LIFE OS</div>
+      <div class="topbar-xp">
+        <div class="topbar-xp-label" id="topbar-level">LV.1</div>
+        <div class="topbar-xp-bar-wrap"><div class="topbar-xp-bar" id="topbar-xp-bar" style="width:0%"></div></div>
+      </div>
+    </div>
+
+    <!-- Content -->
+    <main id="main">
+      {% block content %}{% endblock %}
+    </main>
+
+    <!-- Bottom Nav (mobile) -->
+    <nav id="bottom-nav">
+      <a href="/dashboard" class="bnav-item {% if active=='dashboard' %}active{% endif %}">
+        <span class="bnav-icon">⬡</span><span>Home</span></a>
+      <a href="/dashboard/uni" class="bnav-item {% if active=='uni' %}active{% endif %}">
+        <span class="bnav-icon">◈</span><span>Uni</span></a>
+      <a href="/dashboard/sport" class="bnav-item {% if active=='sport' %}active{% endif %}">
+        <span class="bnav-icon">◉</span><span>Sport</span></a>
+      <a href="/dashboard/projekte" class="bnav-item {% if active=='projekte' %}active{% endif %}">
+        <span class="bnav-icon">🚀</span><span>BEARS</span></a>
+      <a href="/dashboard/sprachen" class="bnav-item {% if active=='sprachen' %}active{% endif %}">
+        <span class="bnav-icon">◎</span><span>Lang</span></a>
+      <a href="/dashboard/timetable" class="bnav-item {% if active=='timetable' %}active{% endif %}">
+        <span class="bnav-icon">▦</span><span>Plan</span></a>
+    </nav>
+  </div>
+
+  <!-- ── Gamify Panel (desktop only) ── -->
+  <aside id="gamify-panel">
+    <div class="gamify-header">
+      <div class="gamify-tag">Gamify Your Life</div>
+      <div class="gamify-title">Life RPG</div>
+    </div>
+    <div class="gamify-scroll">
+
+      <!-- XP / Level -->
+      <div class="g-card">
+        <div class="g-card-title">
+          <span>Level & XP</span>
+          <span id="g-level-badge" style="color:var(--pink);font-family:var(--display);font-weight:700;">Lv.1</span>
+        </div>
+        <div class="xp-level-row">
+          <div class="xp-level-num" id="g-level-num">1</div>
+          <div class="xp-class-name" id="g-class-name">Schlafwandler</div>
+        </div>
+        <div class="xp-bar-wrap"><div class="xp-bar" id="g-xp-bar" style="width:0%"></div></div>
+        <div class="xp-numbers">
+          <span id="g-xp-curr">0 XP</span>
+          <span id="g-xp-next">100 XP</span>
+        </div>
+      </div>
+
+      <!-- Character Stats -->
+      <div class="g-card">
+        <div class="g-card-title">Charakter-Stats</div>
+        <div class="stats-grid" id="g-stats-grid">
+          <!-- filled by gamify.js -->
+        </div>
+      </div>
+
+      <!-- Daily Quests -->
+      <div class="g-card">
+        <div class="g-card-title">
+          <span>Tages-Quests</span>
+          <span id="g-quest-count" style="color:var(--neon);">0/3</span>
+        </div>
+        <div id="g-quests-list">
+          <!-- filled by gamify.js -->
+        </div>
+      </div>
+
+      <!-- Boss Battle -->
+      <div class="g-card">
+        <div class="g-card-title">Boss Battle</div>
+        <div id="g-boss-content" class="boss-wrap">
+          <!-- filled by gamify.js -->
+        </div>
+      </div>
+
+      <!-- Achievements -->
+      <div class="g-card">
+        <div class="g-card-title">
+          <span>Achievements</span>
+          <span id="g-ach-count" style="color:var(--gold);">0/10</span>
+        </div>
+        <div id="g-ach-list">
+          <!-- filled by gamify.js -->
+        </div>
+      </div>
+
+    </div>
+  </aside>
+
+</div><!-- #shell -->
+
+<!-- Mobile Drawer overlay -->
+<div id="drawer-overlay" onclick="closeDrawer()"></div>
+
+<!-- Mobile Drawer -->
+<div id="drawer">
+  <div class="drawer-header">
+    <div class="drawer-title">LIFE OS</div>
+    <button class="drawer-close" onclick="closeDrawer()">✕</button>
+  </div>
+
+  <div class="drawer-nav">
+    <a href="/dashboard"           class="nav-item {% if active=='dashboard' %}active{% endif %}" onclick="closeDrawer()">
+      <span class="nav-icon">⬡</span><span>Dashboard</span></a>
+    <a href="/dashboard/uni"       class="nav-item {% if active=='uni' %}active{% endif %}" onclick="closeDrawer()">
+      <span class="nav-icon">◈</span><span>Uni</span></a>
+    <a href="/dashboard/sport"     class="nav-item {% if active=='sport' %}active{% endif %}" onclick="closeDrawer()">
+      <span class="nav-icon">◉</span><span>Sport</span></a>
+    <a href="/dashboard/projekte"  class="nav-item {% if active=='projekte' %}active{% endif %}" onclick="closeDrawer()">
+      <span class="nav-icon">◈</span><span>Projekte</span></a>
+    <a href="/dashboard/sprachen"  class="nav-item {% if active=='sprachen' %}active{% endif %}" onclick="closeDrawer()">
+      <span class="nav-icon">◎</span><span>Sprachen</span></a>
+    <a href="/dashboard/timetable" class="nav-item {% if active=='timetable' %}active{% endif %}" onclick="closeDrawer()">
+      <span class="nav-icon">▦</span><span>Wochenplan</span></a>
+  </div>
+
+  <div class="drawer-scroll">
     <!-- Pomodoro -->
-    <div id="pom-section">
-      <div id="pom-idle">
-        <button class="pom-idle-btn" onclick="pomShowPicker()">🍅 Pomodoro starten</button>
-        <div style="font-size:8px;color:var(--muted);text-align:center;margin-top:4px;letter-spacing:1px;">P — Shortcut</div>
-      </div>
-      <div id="pom-picker" style="display:none;">
-        <div style="font-size:8px;color:var(--muted2);letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;">Fach wählen</div>
-        <div class="pom-subject-picker" id="pom-subjects"></div>
-        <div class="pom-controls" style="margin-top:8px;">
-          <button class="pom-btn" onclick="pomStart()" style="color:var(--accent);border-color:var(--accent);">▶ Start 25min</button>
-        </div>
-      </div>
-      <div id="pom-running" style="display:none;" class="pom-running">
-        <div class="pom-time" id="pom-display">25:00</div>
-        <div class="pom-subject-label" id="pom-label">KL1 · #1 Session</div>
-        <div class="pom-progress"><div class="pom-progress-fill" id="pom-bar" style="width:0%"></div></div>
-        <div class="pom-controls" id="pom-ctrl-work">
-          <button class="pom-btn" id="pom-pause-btn" onclick="pomPause()">⏸</button>
-          <button class="pom-btn stop" onclick="pomStop()">■</button>
-          <button class="pom-btn" onclick="pomFocus()" title="Fokus-Modus (F)" style="font-size:10px;">⛶</button>
-        </div>
-        <div class="pom-controls" id="pom-ctrl-break" style="display:none;">
-          <button class="pom-btn" onclick="pomSkipBreak()">Überspringen ▶</button>
-        </div>
-        <div id="pom-dots" style="display:flex;gap:3px;justify-content:center;margin-top:6px;"></div>
-        <div style="font-size:8px;color:var(--muted);text-align:center;margin-top:4px;letter-spacing:1px;">F — Fokus · ESC — Beenden</div>
-      </div>
+    <div id="drawer-pom" style="padding:10px;border-bottom:1px solid var(--border);">
+      <div style="font-size:7px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:7px;">Pomodoro</div>
+      <button class="pom-idle-btn" onclick="closeDrawer();pomShowPicker();">▶ Session starten</button>
+      <div style="font-size:8px;color:var(--muted);text-align:center;margin-top:5px;" id="drawer-pom-status">—</div>
     </div>
 
-    <!-- Clock -->
-    <div id="sidebar-clock">
-      <div id="clock-time">--:--</div>
-      <div id="clock-date">— —</div>
-      <div class="mini-progress">
-        <div class="mp-row">
-          <div class="mp-bar-wrap"><div class="mp-bar" id="bar-year" style="width:0%"></div></div>
-          <span class="mp-label">Jahr <span id="pct-year">0</span>%</span>
+    <!-- Clock in drawer -->
+    <div style="padding:10px;border-bottom:1px solid var(--border);">
+      <div style="font-size:7px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:5px;">Zeit</div>
+      <div style="font-family:var(--display);font-size:22px;font-weight:700;letter-spacing:2px;" id="drawer-clock">--:--</div>
+      <div style="font-size:8px;color:var(--muted2);margin-bottom:8px;" id="drawer-date">—</div>
+      <div style="display:flex;flex-direction:column;gap:4px;">
+        <div style="display:flex;align-items:center;gap:6px;">
+          <div style="flex:1;height:2px;background:var(--border);border-radius:1px;overflow:hidden;"><div class="mp-bar" id="d-bar-year" style="width:0%"></div></div>
+          <span style="font-size:8px;color:var(--muted);">Jahr <span id="d-pct-year">0</span>%</span>
         </div>
-        <div class="mp-row">
-          <div class="mp-bar-wrap"><div class="mp-bar" id="bar-month" style="width:0%"></div></div>
-          <span class="mp-label">Monat <span id="pct-month">0</span>%</span>
-        </div>
-        <div class="mp-row">
-          <div class="mp-bar-wrap"><div class="mp-bar" id="bar-week" style="width:0%"></div></div>
-          <span class="mp-label">Woche <span id="pct-week">0</span>%</span>
+        <div style="display:flex;align-items:center;gap:6px;">
+          <div style="flex:1;height:2px;background:var(--border);border-radius:1px;overflow:hidden;"><div class="mp-bar" id="d-bar-month" style="width:0%"></div></div>
+          <span style="font-size:8px;color:var(--muted);">Monat <span id="d-pct-month">0</span>%</span>
         </div>
       </div>
     </div>
 
-    <!-- Streak -->
-    <div class="streak-badge" id="streak-section" style="display:none;">
-      <div class="streak-label">Streak</div>
+    <!-- Streak in drawer -->
+    <div id="drawer-streak" style="padding:10px;border-bottom:1px solid var(--border);display:none;">
+      <div style="font-size:7px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:5px;">Streak</div>
       <div style="display:flex;align-items:baseline;gap:5px;">
-        <span class="streak-num" id="streak-num">1</span>
-        <span class="streak-sub" id="streak-sub">Tag</span>
+        <span style="font-family:var(--display);font-size:24px;font-weight:900;color:var(--neon);" id="drawer-streak-num">1</span>
+        <span style="font-size:10px;color:var(--muted2);" id="drawer-streak-sub">Tag</span>
       </div>
-      <div id="streak-log" style="margin-top:8px;border-top:1px solid var(--border);padding-top:6px;display:none;"></div>
     </div>
 
-    <!-- Manual reminder -->
-    <div style="padding:8px 12px;">
-      <button onclick="showReminder(true)"
-        style="width:100%;padding:6px;background:transparent;border:1px dashed var(--border);color:var(--muted2);border-radius:3px;font-family:var(--mono);font-size:9px;letter-spacing:1px;transition:color 0.12s;"
+    <!-- Gamify in drawer -->
+    <div style="padding:10px;border-bottom:1px solid var(--border);">
+      <div style="font-size:7px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:7px;">Life RPG</div>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+        <span style="font-family:var(--display);font-size:16px;font-weight:900;color:var(--pink);" id="drawer-level">Lv.1</span>
+        <span style="font-size:9px;color:var(--muted2);" id="drawer-class">Schlafwandler</span>
+      </div>
+      <div style="height:5px;background:var(--border);border-radius:1px;overflow:hidden;">
+        <div style="height:100%;background:var(--pink);box-shadow:0 0 6px var(--pink);transition:width 0.5s;" id="drawer-xp-bar"></div>
+      </div>
+    </div>
+
+    <!-- Reminder -->
+    <div style="padding:10px;">
+      <button onclick="closeDrawer();showReminder(true);"
+        style="width:100%;padding:8px;background:transparent;border:1px dashed var(--border2);color:var(--muted2);font-family:var(--mono);font-size:9px;cursor:pointer;transition:all 0.12s;border-radius:2px;"
         onmouseenter="this.style.color='var(--text)'" onmouseleave="this.style.color='var(--muted2)'">
         ⏰ Erinnerung anzeigen
       </button>
     </div>
-  </nav>
-
-  <main id="main">
-    {% block content %}{% endblock %}
-  </main>
+  </div>
 </div>
 
-<!-- Toast container -->
+<!-- Toast -->
 <div id="toast-container"></div>
 
 <!-- Reminder Modal -->
 <div class="reminder-backdrop" id="reminder-modal" style="display:none;" onclick="if(event.target===this)closeReminder()">
-  <div class="reminder-card">
-    <div class="reminder-tag" id="reminder-tag" style="color:var(--accent);">⏰ Life OS — Erinnerung</div>
-    <div class="reminder-title" id="reminder-title">Zeit zu lernen!</div>
-    <div class="reminder-body" id="reminder-body"></div>
-    <button class="reminder-start" onclick="reminderStart()">▶ Pomodoro starten — 25 min</button>
-    <div class="reminder-secondary">
-      <button class="reminder-snooze" onclick="reminderSnooze()">Snooze 30 min</button>
-      <button class="reminder-dismiss" onclick="closeReminder()">Schon dabei ✓</button>
+  <div class="retro-win-stack">
+    <!-- Background shadow windows -->
+    <div class="retro-win retro-win-3"></div>
+    <div class="retro-win retro-win-2"></div>
+    <!-- Main window -->
+    <div class="retro-win">
+      <div class="rw-bar">
+        <div class="rw-dots">
+          <div class="rw-dot r" onclick="closeReminder()" title="Schließen"></div>
+          <div class="rw-dot y"></div>
+          <div class="rw-dot g"></div>
+        </div>
+        <div class="rw-title" id="reminder-win-title">✎ Life OS — Erinnerung</div>
+        <div class="rw-close" onclick="closeReminder()">✕</div>
+      </div>
+      <div class="rw-body">
+        <div class="rw-type" id="reminder-tag">⏰ Erinnerung</div>
+        <div class="rw-msg" id="reminder-title">Zeit zu lernen!</div>
+        <div class="rw-sub" id="reminder-body"></div>
+        <div class="rw-source" id="reminder-source"></div>
+        <button class="rw-btn-main" onclick="reminderStart()">▶ Pomodoro starten — 25 min</button>
+        <div class="rw-actions">
+          <button class="rw-btn-sec" onclick="reminderSnooze()">⏸ Snooze 30 min</button>
+          <button class="rw-btn-sec" onclick="closeReminder()">✓ Schon dabei</button>
+        </div>
+      </div>
     </div>
   </div>
 </div>
 
-<!-- Focus Mode Overlay -->
+<!-- Floating motivation bubbles -->
+<div id="motiv-stack"></div>
+
+<!-- Focus Mode -->
 <div class="focus-overlay" id="focus-overlay" style="display:none;">
   <div class="focus-phase" id="focus-phase">Deep Work</div>
   <div class="focus-subject" id="focus-subject">KL1</div>
@@ -138,20 +358,27 @@
     <button class="focus-btn" onclick="pomStop();closeFocus()">■ Stop</button>
     <button class="focus-btn" onclick="closeFocus()">↙ Minimieren</button>
   </div>
-  <div class="focus-hint">ESC — Fokus-Modus beenden · F — Umschalten</div>
+  <div class="focus-hint">ESC · F — Fokus-Modus</div>
 </div>
 
 <!-- Session Log -->
 <div class="session-log" id="session-log" style="display:none;">
-  <div class="session-log-title">✅ Session abgeschlossen!</div>
-  <div class="session-log-sub" id="session-log-sub">KL1 · Was hast du gelernt?</div>
+  <div class="session-log-title">✓ Session abgeschlossen!</div>
+  <div class="session-log-sub" id="session-log-sub">Was hast du gelernt?</div>
   <input class="session-log-input" id="session-log-input" placeholder="z.B. Lagrange-Gleichungen..." autocomplete="off">
   <div class="session-log-actions">
     <button class="log-save" onclick="saveSessionLog()">Speichern</button>
-    <button class="log-skip" onclick="closeSessionLog()">Überspringen</button>
+    <button class="log-skip" onclick="closeSessionLog()">Skip</button>
   </div>
 </div>
 
 <script src="/static/app.js"></script>
+<script src="/static/gamify.js"></script>
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/static/sw.js', { scope: '/' })
+    .catch(() => {});
+}
+</script>
 </body>
 </html>
